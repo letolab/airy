@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{% block title %}{{ handler.settings["app_title"] }}{% end %}</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="description" content="{% block meta_description %}{% end %}" />
+		<meta name="keywords" content="{% block meta_keywords %}{% end %}t" />
+		
+		<link rel="icon" type="image/png" href="/static/favicon.png"/>
+		<link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css"/>
+		<link rel="stylesheet" href="/static/css/style.css"/>
+	</head>
+	<body>
+		<div class="container">
+			{% block header %}
+			<div id="top">
+				<h1>{{ handler.settings["app_title"] }}</h1>
+                <div class="clear"></div>
+			</div>
+			{% end %}
+			<div class="content">
+			{% block content %}
+				<p>Hello!</p>
+			{% end %}
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,65 @@
+div#logo {
+    float: left;
+}
+
+div#top-menu {
+    float: right;
+    display: inline-block;
+    color: #aaa;
+    font-size: 32px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+div#top-menu a {
+	display: inline-block;
+    padding: 2px 20px;
+    margin: 130px 7px 0 7px;
+    font-weight: 300;
+    color: #690000;
+}
+
+div#top-menu a:hover {
+    text-decoration: none;
+    color: #BF2121;
+}
+
+div.user-block {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+h1 {
+    font-weight: 300;
+}
+
+.clear {
+    clear: both;
+}
+
+.center {
+	text-align: center;
+}
+
+.margin-2 {
+	margin: 2em 0;
+}
+
+.contact-form {
+	padding-left: 0;
+}
+
+#submenu_services {
+	position: absolute;
+	margin-top: 10px;
+}
+#submenu_services li {
+	list-style: none;
+	font-size: 15px;
+}
+ul#submenu_services a {
+	margin: 0px;
+	padding: 2px;
+	font-size: 14px;
+}
