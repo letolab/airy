@@ -16,8 +16,8 @@ airy = {
         airy.request('get', airy.history.getState().hash);
     },
 
-    request: function(method, url, data) {
-        if (airy.history.getState().hash == url) {
+    request: function(method, url, data, nostate) {
+        if (airy.history.getState().hash == url || nostate) {
             if (data) {
                 airy.socket.emit(method, url, data);
             } else {
@@ -55,7 +55,7 @@ airy = {
         links: function() {
             $('a').live('click', function() {
                 if (airy.options.is_airy_link($(this))) {
-                    airy.request('get', $(this).attr('href'));
+                    airy.request('get', $(this).attr('href'), null, airy.options.implies_state_change($(this)));
                     return false;
                 }
             });
@@ -68,9 +68,9 @@ airy = {
                         form_url = $(this).attr('action');
                     }
                     if ($(this).attr('method').toLowerCase() == 'get') {
-                        airy.request('get', form_url+'?'+$(this).serialize());
+                        airy.request('get', form_url+'?'+$(this).serialize(), null, airy.options.implies_state_change($(this)));
                     } else if ($(this).attr('method').toLowerCase() == 'post') {
-                        airy.request('post', form_url, $(this).serializeObject());
+                        airy.request('post', form_url, $(this).serializeObject(), airy.options.implies_state_change($(this)));
                     }
                     return false;
                 }
@@ -91,6 +91,11 @@ airy = {
                 return true;
             }
             return false;
+        },
+
+        implies_state_change: function(item) {
+            // when true airy will attempt to change the URL
+            return item.hasClass('no-airy-state');
         }
     }
 }
