@@ -1,0 +1,6 @@
+*.pyc
+*/.ve/*
+.idea/
+*.swp
+.DS_Store
+.tmp*
