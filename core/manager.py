@@ -17,7 +17,7 @@ def execute(project_root, argv):
 
     if len(argv) <= 1:
         print 'Please provide a command.'
-    elif argv[1] == 'run':
+    elif argv[1] == 'run' or argv[1] == 'runserver':
         run(project_root)
     elif argv[1] == 'shell':
         shell()
