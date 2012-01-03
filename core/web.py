@@ -263,6 +263,10 @@ class AiryHandler(object):
         "Append data into target"
         return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
 
+    def remove(self, target):
+        "Remove target"
+        return self.execute('airy.ui.remove("%s")' % target)
+
     def render_string(self, template_name, **kwargs):
         "Render the given template"
         context_processors = getattr(settings, 'template_context_processors', [])
