@@ -20,7 +20,21 @@ class AiryRequestHandler(RequestHandler):
 
     def get_flat_arguments(self):
         return self._flatten_arguments(self.request.arguments)
-    
+
+    def get_current_user(self):
+        for backend_name in getattr(settings, 'authentication_backends', []):
+            backend = __import__(backend_name, fromlist=[backend_name])
+            user = backend.get_current_user(self)
+            if user:
+                return user
+        return None
+
+    def get_cookie(self, name, default=None):
+        """Gets the value of the cookie with the given name, else default."""
+        if self.cookies is not None and name in self.cookies:
+            return unquote(self.cookies[name].value)
+        return default
+
     def render_string(self, template_name, **kwargs):
         context_processors = getattr(settings, 'template_context_processors', [])
         template_args = {'reverse_url': self.reverse_url}
@@ -209,7 +223,6 @@ class AiryHandler(object):
         return decode_signed_value(self.application.settings["cookie_secret"],
                                    name, value, max_age_days=max_age_days)
 
-
     @property
     def current_user(self):
         """The authenticated user for this request.
@@ -225,15 +238,19 @@ class AiryHandler(object):
             self._current_user = self.get_current_user()
         return self._current_user
 
+    def get_current_user(self):
+        for backend_name in getattr(settings, 'authentication_backends', []):
+            backend = __import__(backend_name, fromlist=[backend_name])
+            user = backend.get_current_user(self)
+            if user:
+                return user
+        return None
+
     def require_setting(self, name, feature="this feature"):
         """Raises an exception if the given app setting is not defined."""
         if not self.site.application.settings.get(name):
             raise Exception("You must define the '%s' setting in your "
                             "application to use %s" % (name, feature))
-
-    def get_current_user(self):
-        """Override to determine the current user from, e.g., a cookie."""
-        return None
 
     def get_login_url(self):
         """Override to customize the login URL based on the request. By default, we use the 'login_url' application setting."""
