@@ -1,10 +1,12 @@
 from airy.core.conf import settings
+from airy.core.files.uploadedfile import SimpleUploadedFile
 from tornado.web import *
 from tornado.escape import *
 from tornadio2 import TornadioRouter, SocketConnection, event
 from urlparse import urlparse, parse_qs
 from urllib2 import unquote
 import logging
+import base64
 
 class AiryRequestHandler(RequestHandler):
     "Old-style handler for plain HTTP requests"
@@ -51,11 +53,31 @@ class AiryRequestHandler(RequestHandler):
 class AiryHandler(object):
     "WS-style handler"
 
-    def __init__(self, site, connection, arguments=[], **kwargs):
+    def __init__(self, site, connection, arguments={}, **kwargs):
         self.site = site
         self.application = self.site.application
         self.connection = connection
-        self.arguments = arguments
+        self.arguments = {}
+        self.files = {}
+        for k, values in arguments.iteritems():
+            is_file_content = False
+            for v in values:
+                if isinstance(v, dict) and 'name' in v and 'content' in v:
+                    # this looks like a file
+                    # so we process it differently
+                    try:
+                        mimetype, body = v['content'].split(';', 1)
+                        encoding, file_content = body.split(',', 1)
+                        if encoding == 'base64':
+                            file_content = base64.b64decode(file_content)
+                        else:
+                            raise RuntimeError('Unknown encoding "%s" specified for field "%s"' % (encoding, k))
+                        self.files[k] = SimpleUploadedFile(v['name'], file_content, mimetype)
+                        is_file_content = True
+                    except Exception, e:
+                        print "Failed to decode argument '%s'" % k
+            if not is_file_content:
+                self.arguments[k] = values
         for k,v in kwargs.iteritems():
             setattr(self, k, v)
 
@@ -116,6 +138,9 @@ class AiryHandler(object):
         for key in self.arguments:
             arguments[key] = self.get_arguments(key)
         return self._flatten_arguments(arguments)
+
+    def get_files(self):
+        return self.files
 
     def decode_argument(self, value, name=None):
         """Decodes an argument from the request.

@@ -4,13 +4,9 @@ from tornado import template, autoreload
 from tornadio2 import SocketServer, TornadioRouter
 from airy.core.conf import settings, _preconfigure
 from airy.core import web
-import logging
-import sys
 import os
 
 AIRY_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
-
-from pprint import pprint
 
 def execute(project_root, argv):
     _preconfigure(project_root, argv=argv[1:])
@@ -38,7 +34,7 @@ def run(project_root):
         (r"/airy/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(AIRY_ROOT, 'static')})
     ])
 
-    # add AIry core handler
+    # add Airy core handler
     serverurls.extend(web.core_router.urls)
 
     # add application handlers

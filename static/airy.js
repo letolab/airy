@@ -73,7 +73,9 @@ airy = {
                     if ($(this).attr('method').toLowerCase() == 'get') {
                         airy.request('get', form_url+'?'+$(this).serialize(), null, airy.options.implies_state_change($(this)));
                     } else if ($(this).attr('method').toLowerCase() == 'post') {
-                        airy.request('post', form_url, $(this).serializeObject(), airy.options.implies_state_change($(this)));
+                        $(this).serializeForm(function(data) {
+                            airy.request('post', form_url, data, airy.options.implies_state_change($(this)));
+                        });
                     }
                     return false;
                 }
