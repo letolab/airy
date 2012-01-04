@@ -15,7 +15,7 @@ $(function () {
         return obj;
     };
 
-    $.fn.serializeForm = function(callback) {
+    $.fn.serializeForm = function(callback, data) {
         // process ordinary form fields
         var obj = $(this).serializeObject();
 
@@ -51,7 +51,7 @@ $(function () {
             obj[id] = arg;
             elems++;
             if (elems == inputs) {
-                callback(obj);
+                callback(obj, data);
             }
         }
 
