@@ -305,6 +305,10 @@ class AiryHandler(object):
         "Append data into target"
         return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
 
+    def prepend(self, target, data):
+        "Prepend data into target"
+        return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
+
     def remove(self, target):
         "Remove target"
         return self.execute('airy.ui.remove("%s")' % target)

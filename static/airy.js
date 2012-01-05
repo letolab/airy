@@ -39,6 +39,9 @@ airy = {
         append: function(target, data) {
             $(target).append(data);
         },
+        prepend: function(target, data) {
+            $(target).prepend(data);
+        },
         remove: function(target) {
             $(target).remove();
         }
