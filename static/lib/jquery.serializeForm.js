@@ -25,7 +25,7 @@ $(function () {
 
         var formFiles = $(this).find('input[type="file"]:enabled');
         if (formFiles.length == 0) {
-            callback(obj);
+            callback(obj, data);
         }
 
         // process files via File API

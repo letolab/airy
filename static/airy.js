@@ -74,7 +74,7 @@ airy = {
                         form_url = $(this).attr('action');
                     }
                     if ($(this).attr('method').toLowerCase() == 'get') {
-                        airy.request('get', form_url+'?'+$(this).serialize(), null, airy.options.no_state_change(this));
+                        airy.request('get', form_url+'?'+$(this).serialize(), null, airy.options.no_state_change($(this)));
                     } else if ($(this).attr('method').toLowerCase() == 'post') {
                         $(this).serializeForm(function(data, form) {
                             airy.request('post', form_url, data, airy.options.no_state_change(form));
