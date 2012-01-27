@@ -6,11 +6,6 @@ PROJECT_ROOT = path.abspath(path.dirname(__file__))
 
 # Airy run engine
 
-# test params
-import sys
-sys.path.append(path.join(PROJECT_ROOT, '../airy/'))
-# end test
-
 def main():
     from airy.core import ve
     ve.check_ve(PROJECT_ROOT, sys.argv)
