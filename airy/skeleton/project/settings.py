@@ -5,7 +5,7 @@ debug = True
 database_name = 'airydb' # replace with your Mongo DB name
 
 installed_apps = [
-    # 'users',
+    'users',
 ]
 
 template_context_processors = [
@@ -16,10 +16,10 @@ template_context_processors = [
 
 login_url = '/accounts/login'
 
-cookie_secret = 'airy' # replace with yours
+cookie_secret = 'airy_secret' # replace with yours
 
 authentication_backends = [
-    #'users.auth',
+    'users.auth',
 ]
 
 datetime_input_formats = (

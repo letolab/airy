@@ -1,0 +1,46 @@
+{% block content %}
+
+{% set current_user = user %}
+
+<div class="row">
+    <div class="three columns">
+        <div class="profile-picture-box">
+            <div id="profile-picture">
+                {% include 'picture.html' %}
+            </div>
+            <div class="profile-picture-change">
+            <a href="/accounts/profile/picture/upload" class="no-airy-state small">Change picture</a>
+            </div>
+
+            <br /><br />
+            <h4>Preview:</h4>
+            <a href="/u/{{ user.username }}" class="small">See your profile how others see it.</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="six columns">
+        <h3>
+            <span field="first_name" class="content-editable">{{ user.first_name }}</span>
+            <span field="last_name" class="content-editable">{{ user.last_name }}</span>
+        </h3>
+
+        <p field="headline" class="content-editable">{% if user.headline %}{{ user.headline }}{% else %}Add headline{% end %}</p>
+
+        <h4>Summary &nbsp;</h4>
+        <p field="bio" class="content-editable">{% if user.bio %}{{ user.bio }}{% else %}---{% end %}</p>
+        <hr/>
+
+        <h4>Contact &nbsp;</h4>
+        <p field="contact" class="content-editable">{% if user.contact %}{{ user.contact }}{% else %}---{% end %} </p>
+        <hr/>
+
+        <h4>I am on other sites &nbsp;</h4>
+        <p field="other_sites" class="light content-editable">{% if user.other_sites %}{{ user.other_sites }}{% else %}---{% end %}</p>
+
+    </div>
+
+</div>
+
+        
+{% end %}

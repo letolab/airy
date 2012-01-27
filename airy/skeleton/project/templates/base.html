@@ -17,8 +17,6 @@
 		<link rel="stylesheet" href="/static/stylesheets/ie.css">
 	<![endif]-->
 
-    {% block headcss %}{% end %}
-
     <!-- JavaScript Files -->
     <script type="text/javascript" src="/airy/lib/jquery-1.6.1.min.js"></script>
 	<script type="text/javascript" src="/airy/lib/jquery.history.js"></script>
@@ -26,42 +24,24 @@
 	<script type="text/javascript" src="/airy/lib/jquery.cookie.js"></script>
     <script type="text/javascript" src="/airy/socket.io.js"></script>
 	<script type="text/javascript" src="/airy/airy.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.editableText.js"></script>
-    <script type="text/javascript" src="/static/js/jquery-ui-1.8.17.custom.min.js"></script>
-	<script type="text/javascript" src="/static/js/unballpark.js"></script>
+
+    <!-- project-specific JavaScript Files -->
+    <script type="text/javascript" src="/static/javascripts/jquery.editableText.js"></script>
+    <script type="text/javascript" src="/static/javascripts/project.js"></script>
 
 	<!-- IE Fix for HTML5 Tags -->
 	<!--[if lt IE 9]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-
-    {% block headjs %}{% end %}
 </head>
 
 <body>
-    <div id="popup">
-        <div id="popup-content">
-            <div id="popup-title"></div>
-            <div id="popup-close"></div>
-            <div class="clear"></div>
-            <div id="popup-body"></div>
-        </div>
-    </div>
-    {% block topmenu %}{% end %}
     <div id="page" class="container">
-
         <div class="row">
+            {% block topmenu %}{% end %}
             <div class="twelve columns">
                 {% block page_content %}{% end %}
             </div>
-            <div id="test"></div>
-            <div class="clear"></div>
-        </div>
-
-        <div id="footer" class="row">
-            {% block footer %}
-                &copy; 2012 UnBallPark. All rights reserved.
-            {% end %}
         </div>
     </div>
 </body>
