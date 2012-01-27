@@ -21,7 +21,7 @@ setup(
         'ipython',
     ],
     scripts=[
-        'bin/airy-admin.py',
+        'airy/bin/airy-admin.py',
     ],
     classifiers=[
         "Programming Language :: Python",
