@@ -1,0 +1,4 @@
+-e git://github.com/facebook/tornado.git#egg=tornado
+-e git://github.com/hmarr/mongoengine.git@dev#egg=mongoengine
+-e git://github.com/MrJoes/tornadio2.git#egg=tornadio2
+

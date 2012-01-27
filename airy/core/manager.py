@@ -18,7 +18,7 @@ def execute(project_root, argv):
     elif argv[1] == 'shell':
         shell()
     else:
-        print 'Unrecognised command.'
+        print "Error: unknown command '%s'" % argv[1]
 
 
 def shell():

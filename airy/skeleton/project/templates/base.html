@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
+	
+    <title>{% block title %}Home{% end %} | UnBallPark</title>
+
+	<!-- CSS Files -->
+	<link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/foundation.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/style.css" />
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" href="/static/stylesheets/ie.css">
+	<![endif]-->
+
+    <!-- JavaScript Files -->
+    <script type="text/javascript" src="/airy/lib/jquery-1.6.1.min.js"></script>
+	<script type="text/javascript" src="/airy/lib/jquery.history.js"></script>
+    <script type="text/javascript" src="/airy/lib/jquery.serializeForm.js"></script>
+	<script type="text/javascript" src="/airy/lib/jquery.cookie.js"></script>
+    <script type="text/javascript" src="/airy/socket.io.js"></script>
+	<script type="text/javascript" src="/airy/airy.js"></script>
+
+    <!-- project-specific JavaScript Files -->
+    <script type="text/javascript" src="/static/javascripts/jquery.editableText.js"></script>
+    <script type="text/javascript" src="/static/javascripts/project.js"></script>
+
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+    <div id="page" class="container">
+        <div class="row">
+            {% block topmenu %}{% end %}
+            <div class="twelve columns">
+                {% block page_content %}{% end %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

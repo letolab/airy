@@ -1,0 +1,21 @@
+{% block content %}
+	
+<hr class="space"/>
+
+<div class="row">
+	<div class="five columns panel">
+		<h3>Log in</h3>
+	    <form class="nice" action="" method="post">
+	    <ul class="form">
+            {% raw form.as_ul() %}
+	        <li>
+	        	<input class="nice white button radius" type="submit" value="Log in">
+	        	<a class="offset-by-one" href="/accounts/register">Create Account</a>
+	    	</li>
+            <a class="" href="/accounts/recovery/">Forgot your password?</a>
+		</ul>
+	    </form>
+	    </form>
+	</div>
+</div>
+{% end %}

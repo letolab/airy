@@ -1,0 +1,38 @@
+{% block content %}
+
+<div class="row">
+
+    <div class="three columns">
+
+        <div class="profile-picture-box">
+            <div id="profile-picture">
+            {% include 'picture.html' %}
+            </div>
+            <br /><br />
+        </div>
+
+    </div>
+
+    <div class="six columns">
+        <h3>
+            {{ user.first_name }} {{ user.last_name }}
+        </h3>
+
+        <p>{{ user.headline }}</p>
+
+        <h4>Summary &nbsp;</h4>
+        <p>{% if user.bio %}{{ user.bio }}{% else %}---{% end %}</p>
+        <hr/>
+
+        <h4>Contact &nbsp;</h4>
+        <p>{% if user.contact %}{{ user.contact }}{% else %}---{% end %} </p>
+        <hr/>
+
+        <h4>I am on other sites &nbsp;</h4>
+        <p>{% if user.other_sites %}{{ user.other_sites }}{% else %}---{% end %}</p>
+
+    </div>
+
+</div>
+
+{% end %}

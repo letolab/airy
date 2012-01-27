@@ -1,0 +1,5 @@
+{% if user.picture_url %}
+<img src="{{ user.picture_url }}" alt="{{ user.username }}'s Picture'" class="profile-picture" />
+{% else %}
+<img src="/static/images/profile-default.png" alt="{{ user.username }}'s Picture'" class="profile-picture" />
+{% end %}
