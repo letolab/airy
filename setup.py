@@ -10,6 +10,7 @@ setup(
     author = "LetoLab Ltd",
     author_email = "team@letolab.com",
     description = ("Web Application Framework"),
+    long_description=read('README'),
     license = "BSD",
     keywords = "web development websockets",
     url = "http://airy.letolab.com",
@@ -19,7 +20,9 @@ setup(
         'simplejson',
         'ipython',
     ],
-    long_description=read('README'),
+    scripts=[
+        'airy/bin/airy-admin.py',
+    ],
     classifiers=[
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP",

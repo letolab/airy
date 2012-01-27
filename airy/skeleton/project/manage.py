@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from os import path
+import sys
 
 PROJECT_ROOT = path.abspath(path.dirname(__file__))
 
