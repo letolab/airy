@@ -1,0 +1,18 @@
+{% block content %}
+
+<hr class="space"/>
+
+<div class="row">
+	<div class="five columns panel">
+		<h3>Create an Account</h3>
+		<form class="nice" action="/accounts/register" method="post">
+		<ul class="form">
+		    {% raw form.as_ul() %}
+			<li class="five columns centered">
+            	<input class="large grey button radius" type="submit" value="Create Account" />
+			</li>
+		</ul>
+		</form>
+	</div>
+</div>
+{% end %}

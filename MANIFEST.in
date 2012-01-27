@@ -1,0 +1,2 @@
+recursive-include airy/skeleton *
+recursive-include airy/static *

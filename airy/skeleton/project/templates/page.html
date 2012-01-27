@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block topmenu %}
+    <ul class="nav-bar" id="menu">
+        {% if current_user %}
+        {% include 'users/user_in_menu.html' %}
+        {% else %}
+        {% include 'users/user_out_menu.html' %}
+        {% end %}
+    </ul>
+{% end %}
+
+{% block page_content %}
+
+    <div id="content">
+        {% block content %}
+            {% include 'index.html' %}
+        {% end %}
+    </div>
+
+{% end %}
