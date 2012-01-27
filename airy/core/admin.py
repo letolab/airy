@@ -35,7 +35,7 @@ def startproject(project_name):
     shutil.copytree(skeleton_path, os.path.join(os.getcwd(), project_name))
     print "Created project '%s'." % project_name
 
-def startapp(app_name:
+def startapp(app_name):
     admin_path = os.path.abspath(os.path.dirname(__file__))
     skeleton_path = os.path.join(admin_path, '../skeleton/app')
     shutil.copytree(skeleton_path, os.path.join(os.getcwd(), app_name))
