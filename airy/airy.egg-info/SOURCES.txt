@@ -1,0 +1,6 @@
+README
+setup.py
+airy/airy.egg-info/PKG-INFO
+airy/airy.egg-info/SOURCES.txt
+airy/airy.egg-info/dependency_links.txt
+airy/airy.egg-info/top_level.txt

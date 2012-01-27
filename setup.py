@@ -1,0 +1,30 @@
+import os
+from setuptools import setup, find_packages
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+setup(
+    name = "airy",
+    version = "0.1",
+    author = "LetoLab Ltd",
+    author_email = "team@letolab.com",
+    description = ("Web Application Framework"),
+    license = "BSD",
+    keywords = "web development websockets",
+    url = "http://airy.letolab.com",
+    packages=find_packages(),
+    package_data={
+        'skeleton': ['*']
+    },
+    requires=[
+        'simplejson',
+        'ipython',
+    ],
+    long_description=read('README'),
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Topic :: Utilities",
+        "License :: OSI Approved :: BSD License",
+        ],
+)

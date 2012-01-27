@@ -1,0 +1,8 @@
+<span>
+    <a class="tag-link" href="">
+        {{ interest.tag }}
+    </a>
+    {% if current_user == user %}
+    <button class="delete-complex-field delete-link" type="button" field="interests" target="{{ interest.id }}"></button>
+    {% end %}
+</span>

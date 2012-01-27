@@ -1,0 +1,9 @@
+<div id="profile-picture-drop">
+    <h4>Drag and Drop<br /> a file here</h4>
+    <h5>or</h5>
+</div>
+<form action="/accounts/profile/picture/upload" method="post" class="no-airy-state">
+    {% raw form.as_p() %}
+    <input class="button radius small" type="submit" value="Upload" />
+    <a href="/accounts/profile/picture/view" class="white button radius small no-airy-state">Cancel</a>
+</form>

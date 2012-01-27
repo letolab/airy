@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block topmenu %}
+
+    <div class="topbar-wrapper">
+	<div class="topbar">
+		<div class="topbar-inner">
+            <div class="topbar-container">
+                <h3><a href="/">UnBallPark</a></h3>
+                <ul class="nav">
+                    <li id="nav-projects">
+                        <a href="/projects/">Projects</a>
+                    </li>
+                </ul>
+                <ul class="nav secondary-nav" id="menu-right">
+                {% if current_user %}
+                {% include 'user_in_menu.html' %}
+                {% else %}
+                {% include 'user_out_menu.html' %}
+                {% end %}
+                </ul>
+            </div>
+            <div class="clear"></div>
+		</div>
+	</div>
+    </div>
+
+{% end %}
+
+{% block page_content %}
+
+    <div id="content">
+        {% block content %}{% end %}
+    </div>
+
+{% end %}
