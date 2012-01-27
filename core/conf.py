@@ -12,6 +12,12 @@ define("static_path", default="./static", help="Static directory path")
 define("app_title", default="Example Web App", help="Default app title")
 define("xsrf_cookies", default=True, help="Disable XSRF cookies")
 define("installed_apps", default=[], help="List of installed applications", multiple=True)
+define("host", default="127.0.0.1:8000")
+define("email_host", default="smtp.gmail.com")
+define("email_port", default=587)
+define("email_host_user", default="")
+define("email_host_password", default="")
+
 
 class Settings(object):
     def __init__(self, **entries):
