@@ -14,17 +14,17 @@ setup(
     keywords = "web development websockets",
     url = "http://airy.letolab.com",
     packages=find_packages(),
-    package_data={
-        'skeleton': ['*']
-    },
+    include_package_data=True,
     requires=[
         'simplejson',
         'ipython',
     ],
     long_description=read('README'),
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Programming Language :: Python",
+        "Topic :: Internet :: WWW/HTTP",
         "Topic :: Utilities",
         "License :: OSI Approved :: BSD License",
-        ],
+        "Development Status :: 3 - Alpha",
+    ],
 )
