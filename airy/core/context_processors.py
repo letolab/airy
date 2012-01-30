@@ -1,10 +1,5 @@
-from tornado.escape import to_unicode
-
-class Markup(object):
-    @staticmethod
-    def linebreaks(text):
-        return to_unicode(text).replace('\n', '<br />')
+from airy.core import markup as markup_mod
 
 def markup(handler, **kwargs):
-    return {'markup': Markup()}
+    return {'markup': markup_mod}
 
