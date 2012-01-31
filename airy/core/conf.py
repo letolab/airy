@@ -28,7 +28,7 @@ Most commonly used options:
 
     Path to your project's static files (Airy will serve it automatically on /static/)
 
-For a full list of options, do ``python manage.py help``
+For a full list of options, see ``python manage.py help``
 
 """
 import tornado.options

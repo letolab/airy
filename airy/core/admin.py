@@ -28,6 +28,22 @@ def execute():
 
 def help():
     print 'Usage: python %s <command>' % sys.argv[0]
+    print """
+Available commands:
+
+    startproject <project_name>:
+
+        Creates a new project in a folder named <project_name>
+
+    startapp <app_name>:
+
+        Creates a new app in a folder named <app_name>
+
+    help:
+
+        Displays this help
+
+"""
 
 def startproject(project_name):
     admin_path = os.path.abspath(os.path.dirname(__file__))

@@ -6,6 +6,9 @@ import re
 _URL_RE = re.compile(ur"""\b((?:([\w-]+):(/{1,3})|www[.])(?:(?:(?:[^\s&()]|&amp;|&quot;)*(?:[^!"#$%&'()*+,.:;<=>?@\[\]^`{|}~\s]))|(?:\((?:[^\s&()]|&amp;|&quot;)*\)))+)""")
 
 def linebreaks(text):
+    """
+    Turns every new-line ("\n") into a "<br />" HTML tag.
+    """
     return to_unicode(text).replace('\n', '<br />')
 
 def linkify(text, shorten=False, extra_params="",
@@ -89,6 +92,16 @@ def linkify(text, shorten=False, extra_params="",
     return _URL_RE.sub(make_link, text)
 
 def sanitize(text):
+    """
+    Cleans up user input from potentially dangerous things,
+    such as <script>, <img src="javascript:..." />, <a href="javascript:.."> etc.
+
+    Please note, this function is **not 100% safe**.
+
+    If want to ensure the input is safe it's best to just escape all HTML.
+
+    If you decide to use ``markup,sanitize()`` make sure you have html5lib available on your system/project.
+    """
     try:
         from airy.core import sanitizer
         return sanitizer.clean_html(text)
