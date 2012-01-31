@@ -28,7 +28,7 @@ project, so all you need is:
 Installation
 ============
 
-    pip install https://github.com/letolab/airy/tarball/master
+    pip install airy
 
 This will install Airy itself and the ``airy-admin.py`` script.
 
