@@ -3,5 +3,6 @@ Settings
 
 .. automodule:: airy.core.conf
    :members:
-   :undoc-members:
-   :show-inheritance:
+   :inherited-members:
+   :member-order: bysource
+

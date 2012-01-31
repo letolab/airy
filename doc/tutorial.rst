@@ -51,6 +51,8 @@ Starting up
 
 Run ``update_ve`` to download and build all the required modules, then start your project:
 
+.. code-block:: console
+
     $ python manage.py update_ve
     $ python manage.py run
 
@@ -66,4 +68,20 @@ Then open your browser and navigate to http://localhost:8000/
 
 Hopefully you will see the default Airy welcome page.
 
+
+Next Steps
+----------
+
+You may want to check out the ``users`` app (included by default in every new project).
+
+If you want to start a new app use:
+
+.. code-block:: console
+
+   $ airy-admin.py startapp <app_name>
+
+This will create a new folder ``test/`` in the current directory. Don't forget to add
+your new app to ``settings.installed_apps``.
+
+See :doc:`API Reference <reference>` for documentation on other .
 

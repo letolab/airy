@@ -1,4 +1,36 @@
-"Configuration"
+"""
+Configuring Airy projects.
+
+By default Airy parses ``settings.py`` file located in the project's directory.
+
+You may specify parameters either in the file or on command line when launching your
+project, for example:
+
+.. code-block:: console
+
+    $ python manage.py runserver --port=80
+
+Most commonly used options:
+
+* port (default=8000)
+
+    Run on the given port
+
+* host (default="127.0.0.1:8000")
+
+    Bind to the given ip/port.
+
+* template_path (default="./templates")
+
+    Path to the directory containing project templates.
+
+* static_path (default="./static")
+
+    Path to your project's static files (Airy will serve it automatically on /static/)
+
+For a full list of options, do ``python manage.py help``
+
+"""
 import tornado.options
 from tornado.options import define, options
 import os

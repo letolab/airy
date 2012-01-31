@@ -17,6 +17,9 @@ def execute(project_root, argv):
         run(project_root)
     elif argv[1] == 'shell':
         shell()
+    elif argv[1] == 'help':
+        import tornado.options
+        tornado.options.print_help()
     else:
         print "Error: unknown command '%s'" % argv[1]
 

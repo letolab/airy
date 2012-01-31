@@ -8,6 +8,52 @@ from urllib2 import unquote
 import logging
 import base64
 
+class AirySite(object):
+    """
+    AirySite manages all current Socket.io connections and template loading.
+    """
+    connections = set()
+    application = None
+    loader = None
+
+    def resolve_url(self, url, connection, arguments=[]):
+        handler = None
+        args = []
+        kwargs = {}
+
+        # unable to check host at the moment, so just loop over all handlers
+        for pattern, handlers in self.application.handlers:
+            for spec in handlers:
+                if issubclass(spec.handler_class, AiryHandler):
+                    match = spec.regex.match(url)
+                    if match:
+                        if spec.regex.groups:
+                            # None-safe wrapper around url_unescape to handle
+                            # unmatched optional groups correctly
+                            def unquote(s):
+                                if s is None: return s
+                                return escape.url_unescape(s, encoding=None)
+                                # Pass matched groups to the handler.  Since
+                            # match.groups() includes both named and unnamed groups,
+                            # we want to use either groups or groupdict but not both.
+                            # Note that args are passed as bytes so the handler can
+                            # decide what encoding to use.
+
+                            if spec.regex.groupindex:
+                                kwargs = dict(
+                                    (k, unquote(v))
+                                    for (k, v) in match.groupdict().iteritems())
+                            else:
+                                args = [unquote(s) for s in match.groups()]
+                        handler = spec.handler_class(self, connection, arguments, **spec.kwargs)
+                        break
+
+        return handler, args, kwargs
+
+site = AirySite()
+
+
+
 class AiryRequestHandler(RequestHandler):
     """
     Old-style handler for plain HTTP requests. Mimics the behaviour
@@ -116,8 +162,9 @@ class AiryHandler(object):
                     self.render("#content", "accounts/login.html", form=form)
 
     This is purely for convenience - in reality all data is sent via WebSockets so technically
-    a GET request is no different from a POST requests. However to simplify form processing and site
+    a GET request is no different from a POST request. However to simplify form processing and site
     interaction, we send requests to the appropriate method of a handler.
+
     """
 
     def __init__(self, site, connection, arguments={}, **kwargs):
@@ -490,51 +537,6 @@ class AiryHandler(object):
         html = self.render_string(template_name, **kwargs)
         self.insert(target, html)
         return self
-
-
-
-class AirySite(object):
-    "Airy Site"
-    connections = set()
-    application = None
-    loader = None
-
-    def resolve_url(self, url, connection, arguments=[]):
-        handler = None
-        args = []
-        kwargs = {}
-
-        # unable to check host at the moment, so just loop over all handlers
-        for pattern, handlers in self.application.handlers:
-            for spec in handlers:
-                if issubclass(spec.handler_class, AiryHandler):
-                    match = spec.regex.match(url)
-                    if match:
-                        if spec.regex.groups:
-                            # None-safe wrapper around url_unescape to handle
-                            # unmatched optional groups correctly
-                            def unquote(s):
-                                if s is None: return s
-                                return escape.url_unescape(s, encoding=None)
-                            # Pass matched groups to the handler.  Since
-                            # match.groups() includes both named and unnamed groups,
-                            # we want to use either groups or groupdict but not both.
-                            # Note that args are passed as bytes so the handler can
-                            # decide what encoding to use.
-
-                            if spec.regex.groupindex:
-                                kwargs = dict(
-                                    (k, unquote(v))
-                                    for (k, v) in match.groupdict().iteritems())
-                            else:
-                                args = [unquote(s) for s in match.groups()]
-                        handler = spec.handler_class(self, connection, arguments, **spec.kwargs)
-                        break
-
-        return handler, args, kwargs
-
-site = AirySite()
-
 
 
 class AiryCoreHandler(SocketConnection):

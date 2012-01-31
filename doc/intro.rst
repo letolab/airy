@@ -28,7 +28,7 @@ Database
 Only MongoDB is currently supported. We will appreciate any help with adding support for other database engines,
 but we have no plans for supporting SQL-based engines or any other relational databases.
 
-Airy comes with a basic ORM, which is provided by `MongoEngine <http://mongoengine.org/>`_
+Airy comes with a simple ORM, which is provided by `MongoEngine <http://mongoengine.org/>`_
 
 Please refer to the `MongoEngine Documentation <http://mongoengine.org/docs/>`_ for details on how to use the database layer.
 
