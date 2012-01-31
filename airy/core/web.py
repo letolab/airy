@@ -9,7 +9,30 @@ import logging
 import base64
 
 class AiryRequestHandler(RequestHandler):
-    "Old-style handler for plain HTTP requests"
+    """
+    Old-style handler for plain HTTP requests. Mimics the behaviour
+    of Tornado's standard ``RequestHandler`` (from ``tornado.web.RequestHandler``).
+
+    Subclasses are expected to process ordinary HTTP requests.
+
+    An Airy project usually has only one handler which responds to a GET request to any URL
+    and is responsible for rendering the base website template, which would establish
+    a WebSocket connection.
+
+    All other communication is handled by :py:class:`~airy.core.web.AiryHandler` subclasses.
+
+    For example you may render the default "index" page with an AiryRequestHandler:
+
+    .. code-block:: python
+
+        # snippet from the users app, users/handlers.py:
+
+        class IndexHandler(AiryRequestHandler):
+
+            def get(self):
+                self.render("page.html")
+
+    """
 
     def _flatten_arguments(self, arguments):
         data = {}
@@ -21,9 +44,22 @@ class AiryRequestHandler(RequestHandler):
         return data
 
     def get_flat_arguments(self):
+        """
+        Get all arguments as a dictionary where single-value arguments are flat (converted from lists to strings)
+        """
         return self._flatten_arguments(self.request.arguments)
 
     def get_current_user(self):
+        """
+        Returns a User instance for the current request.
+
+        To fetch current user it loads each backend specified in ``settings.authentication_backends`` and
+        calls the ``.get_current_user()`` method of every backend.
+
+        You may specify your own authentication backend in settings and override the default behaviour.
+
+        For more examples refer to the ``users`` app supplied by default with every new project.
+        """
         for backend_name in getattr(settings, 'authentication_backends', []):
             backend = __import__(backend_name, fromlist=[backend_name])
             user = backend.get_current_user(self)
@@ -32,7 +68,7 @@ class AiryRequestHandler(RequestHandler):
         return None
 
     def get_cookie(self, name, default=None):
-        """Gets the value of the cookie with the given name, else default."""
+        """Gets the value of the cookie with the given ``name``, else ``default``."""
         if self.cookies is not None and name in self.cookies:
             return unquote(self.cookies[name].value)
         return default
@@ -51,7 +87,38 @@ class AiryRequestHandler(RequestHandler):
 
 
 class AiryHandler(object):
-    "WS-style handler"
+    """
+    Socket.io base handler, responsible for WebSocket communication.
+
+    All (or most of) your handlers should inherit from AiryHandler.
+
+    It emulates the standard HTTP behaviour by providing callbacks for get() and post() requests,
+    for example:
+
+    .. code-block:: python
+
+        # snippet from the users app, users/handlers.py:
+
+        class AccountsLoginHandler(AiryHandler):
+            def get(self):
+                if self.get_current_user():
+                    self.redirect("/")
+                else:
+                    form = LoginForm()
+                    self.render("#content", "accounts/login.html", form=form)
+
+            def post(self):
+                form = LoginForm(self.get_flat_arguments())
+                if form.is_valid():
+                    form.save(self)
+                    self.redirect("/")
+                else:
+                    self.render("#content", "accounts/login.html", form=form)
+
+    This is purely for convenience - in reality all data is sent via WebSockets so technically
+    a GET request is no different from a POST requests. However to simplify form processing and site
+    interaction, we send requests to the appropriate method of a handler.
+    """
 
     def __init__(self, site, connection, arguments={}, **kwargs):
         self.site = site
@@ -288,33 +355,101 @@ class AiryHandler(object):
 
     #
     # Airy client interaction
-    # 
+    #
     def execute(self, data):
-        "Execute the given data on the client side"
+        """
+        Execute JavaScript given in ``data`` on the client side.
+        """
         self.connection.emit('execute', data)
         return self
 
     def redirect(self, url):
+        """
+        Force client to send a GET request to ``url``.
+
+        This may be used to hand the control over to another handler, for example
+         after log in you may send the client to a home page handler:
+
+        .. code-block:: python
+
+            # snippet from users/handlers.py:
+
+            class AccountsRegisterHandler(AiryHandler):
+
+                # ...
+
+                def post(self):
+                    form = RegistrationForm(self.get_flat_arguments())
+                    if form.is_valid():
+                        user = form.save(self)
+                        # send the client to the homepage handler:
+                        self.redirect("/")
+
+
+        """
         return self.execute('airy.request("get", "%s");' % url)
 
     def insert(self, target, data):
-        "Insert data into target"
+        """
+        Insert ``data`` into ``target``, where ``target`` is a jQuery selector.
+
+        This is an equivalent to jQuery $.insert() function.
+        """
         return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
 
     def append(self, target, data):
-        "Append data into target"
+        """
+        Append ``data`` to ``target``, where ``target`` is a jQuery selector.
+
+        This is an equivalent to jQuery $.append() function.
+        """
         return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
 
     def prepend(self, target, data):
-        "Prepend data into target"
+        """
+        Prepend ``data`` to ``target``, where ``target`` is a jQuery selector.
+
+        This is an equivalent to jQuery $.prepend() function.
+        """
         return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
 
     def remove(self, target):
-        "Remove target"
+        """
+        Remove ``target``, where ``target`` is a jQuery selector.
+
+        This is an equivalent to jQuery $.remove() function.
+        """
         return self.execute('airy.ui.remove("%s")' % target)
 
     def render_string(self, template_name, **kwargs):
-        "Render the given template"
+        """
+        Render the template specified in ``template_name``.
+
+        **Airy** looks up templates in the folder given in ``settings.template_path`` (default: '.templates/')
+
+        We can use render_string() to obtain the output manually before sending it to the client, for example:
+
+        .. code-block:: python
+
+            class MessagesHandler(AiryHandler):
+
+                def get(self):
+
+                    # the client requests a list of all messages
+
+                    # we will iterate over all messages and send each to the client
+                    # adding it to the element matching jQuery selection '#content'
+                    # (i.e. with id='content')
+
+                    for message in Message.objects.all():
+
+                        output = self.render_string('messages/message.html', message=message)
+
+                        self.prepend(output, '#content')
+
+        Note: if you want to just insert() the output of render_string() into ``target``, just use render() instead.
+
+        """
         context_processors = getattr(settings, 'template_context_processors', [])
         template_args = {'reverse_url': self.reverse_url}
         for processor_path in context_processors:
@@ -327,7 +462,31 @@ class AiryHandler(object):
         return html
 
     def render(self, target, template_name, **kwargs):
-        "Render into the target element (jQuery selector)"
+        """
+        Render template into the ``target`` element (jQuery selector).
+
+        This is just a handy shortcut, equivalent to:
+
+        .. code-block:: python
+
+            self.insert(
+                target,
+                self.render_string(template_name, **kwargs)
+            )
+
+        You can use ``self.render()`` to send HTML to the client and insert it directly into ``target``.
+
+        For example, you can have an AiryHandler rendering the home page:
+
+        .. code-block:: python
+
+            class HomeHandler(AiryHandler):
+
+                def get(self):
+                    self.render("#content", "accounts/index.html")
+
+
+        """
         html = self.render_string(template_name, **kwargs)
         self.insert(target, html)
         return self
@@ -379,7 +538,7 @@ site = AirySite()
 
 
 class AiryCoreHandler(SocketConnection):
-    "Main AIry handler dealing with WebSocket manipulations"
+    "Main Airy handler dealing with WebSocket manipulations"
     state = '/'
 
     def on_open(self, info):
@@ -444,44 +603,6 @@ class AiryCoreHandler(SocketConnection):
         logging.info('Socket Disconnected: %s %s' % (self.info.ip, self.info.arguments.get('t', '')))
         site.connections.remove(self)
 
-
-    #
-    # Airy client interaction
-    #
-    def execute(self, data):
-        "Execute the given data on the client side"
-        self.emit('execute', data)
-        return self
-
-    def redirect(self, url):
-        return self.execute('airy.request("get", "%s");' % url)
-
-    def insert(self, target, data):
-        "Insert data into target"
-        return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
-
-    def append(self, target, data):
-        "Append data into target"
-        return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
-
-    def render_string(self, template_name, **kwargs):
-        "Render the given template"
-        context_processors = getattr(settings, 'template_context_processors', [])
-        template_args = {'reverse_url': self.reverse_url}
-        for processor_path in context_processors:
-            path, name = processor_path.rsplit('.', 1)
-            processor_module = __import__(path, fromlist=path)
-            processor = getattr(processor_module, name)
-            template_args.update(processor(self, **kwargs))
-        template_args.update(kwargs)
-        html = self.site.loader.load(template_name).generate(**template_args)
-        return html
-
-    def render(self, target, template_name, **kwargs):
-        "Render into the target element (jQuery selector)"
-        html = self.render_string(template_name, **kwargs)
-        self.insert(target, html)
-        return self
 
 
 core_router = TornadioRouter(AiryCoreHandler)
