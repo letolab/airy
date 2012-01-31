@@ -25,8 +25,8 @@ This means that Airy comes with real-time support built-in which works on any mo
 Database
 --------
 
-Only MongoDB is currently supported. We welcome any help in porting Airy to other database engines, but we
-have no plans for supporting SQL.
+Only MongoDB is currently supported. We will appreciate any help with adding support for other database engines,
+but we have no plans for supporting SQL-based engines or any other relational databases.
 
 Airy comes with a basic ORM, which is provided by `MongoEngine <http://mongoengine.org/>`_
 
