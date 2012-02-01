@@ -28,17 +28,17 @@ project, so all you need is:
 Installation
 ============
 
-    pip install https://github.com/letoosh/airy/tarball/master
+    pip install airy
 
-This will install Airy itself and the "airy-admin.py" script.
+This will install Airy itself and the ``airy-admin.py`` script.
 
 
 Usage
 =====
 
-Once you have it installed, you should be able to use airy-admin.py
+Once you have it installed, you should be able to use ``airy-admin.py``
 
-To create a new project, open a terminal and do:
+To create a new project, open a terminal and do::
 
     airy-admin.py startproject project_name
     cd project_name/
