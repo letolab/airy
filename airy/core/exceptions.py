@@ -36,6 +36,10 @@ class FieldError(Exception):
     """Some kind of problem with a model field."""
     pass
 
+class Http404(Exception):
+    "Requested page does not exist"
+    pass
+
 NON_FIELD_ERRORS = '__all__'
 class ValidationError(Exception):
     """An error while validating data."""
