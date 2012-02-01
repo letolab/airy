@@ -78,6 +78,7 @@ def _ensure_defaults(dsettings, options, project_root, config_filename):
     dsettings['language_code'] = 'en-us'
 
     # settings
+    dsettings['project_root'] = project_root
     dsettings['settings_module'] = config_filename.replace('/', '.')[:-3].strip('.')
 
     # formats
