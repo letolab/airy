@@ -189,7 +189,8 @@ class AiryHandler(object):
                         self.files[k] = SimpleUploadedFile(v['name'], file_content, mimetype)
                         is_file_content = True
                     except Exception, e:
-                        print "Failed to decode argument '%s'" % k
+                        logging.error("Failed to decode argument '%s'" % k)
+                        continue
             if not is_file_content:
                 self.arguments[k] = values
         for k,v in kwargs.iteritems():
