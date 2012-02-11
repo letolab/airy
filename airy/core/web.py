@@ -573,16 +573,20 @@ class AiryCoreHandler(SocketConnection):
         (scheme, host, path, arguments) = self.parse_url(url)
         self.set_state(path)
         handler, hargs, hkwargs = site.resolve_url(path, self, arguments=arguments)
+        hargs.extend(args)
+        hkwargs.update(kwargs)
         if handler:
             logging.info('GET %s from %s %s => %s' % (path, self.info.ip,
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
-            hargs.extend(args)
-            hkwargs.update(kwargs)
-            handler.get(*hargs, **hkwargs)
+            try:
+                handler.get(*hargs, **hkwargs)
+            except Http404:
+                self.process_404(*hargs, **hkwargs)
         else:
             logging.error('GET %s from %s %s failed: no handler found' % \
                           (path, self.info.ip, self.info.arguments.get('t', '')))
+            self.process_404(*hargs, **hkwargs)
 
     @event('post')
     def post(self, url, *args, **kwargs):
@@ -599,21 +603,34 @@ class AiryCoreHandler(SocketConnection):
         arguments.update(data)
         self.set_state(path)
         handler, hargs, hkwargs = site.resolve_url(path, self, arguments=arguments)
+        hargs.extend(args)
+        hkwargs.update(kwargs)
         if handler:
             logging.info('POST %s from %s %s => %s' % (path, self.info.ip,
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
-            hargs.extend(args)
-            hkwargs.update(kwargs)
-            handler.post(*hargs, **hkwargs)
+            try:
+                handler.post(*hargs, **hkwargs)
+            except Http404:
+                self.process_404(*hargs, **hkwargs)
         else:
             logging.error('POST %s from %s %s failed: no handler found' % \
                           (path, self.info.ip, self.info.arguments.get('t', '')))
+            self.process_404(*hargs, **hkwargs)
 
     def on_close(self):
         logging.info('Socket Disconnected: %s %s' % (self.info.ip, self.info.arguments.get('t', '')))
         site.connections.remove(self)
 
+    def process_404(self, *args, **kwargs):
+        try:
+            handler_path = settings.page_not_found_handler
+            path, name = handler_path.rsplit('.', 1)
+            handler_module = __import__(path, fromlist=path)
+            handler_class = getattr(handler_module, name)
+            handler_class(site, self).get()
+        except AttributeError:
+            logging.error('Page with url %s doesn\'t exist' % (kwargs.get('url', ''), ))
 
 
 core_router = TornadioRouter(AiryCoreHandler)
