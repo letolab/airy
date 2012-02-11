@@ -1,4 +1,5 @@
 from airy.core.conf import settings
+from airy.core.exceptions import Http404
 from airy.core.files.uploadedfile import SimpleUploadedFile
 from tornado.web import *
 from tornado.escape import *
@@ -16,7 +17,7 @@ class AirySite(object):
     application = None
     loader = None
 
-    def resolve_url(self, url, connection, arguments=[]):
+    def resolve_url(self, url, connection, arguments={}):
         handler = None
         args = []
         kwargs = {}
@@ -130,6 +131,13 @@ class AiryRequestHandler(RequestHandler):
         template_args.update(kwargs)
         return super(AiryRequestHandler, self).render_string(template_name, **template_args)
 
+    def is_robot(self, *args, **kwargs):
+        robots = ['Googlebot', ]
+        robots.extend(args)
+        for robot in robots:
+            if robot in self.request.headers['User-Agent']:
+                return True
+        return False
 
 
 class AiryHandler(object):
