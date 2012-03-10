@@ -632,5 +632,46 @@ class AiryCoreHandler(SocketConnection):
         except AttributeError:
             logging.error('Page with url %s doesn\'t exist' % (kwargs.get('url', ''), ))
 
+    #
+    # Airy client interaction
+    #
+    def execute(self, data):
+        "Execute the given data on the client side"
+        self.emit('execute', data)
+        return self
+
+    def redirect(self, url):
+        return self.execute('airy.request("get", "%s");' % url)
+
+    def insert(self, target, data):
+        "Insert data into target"
+        return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
+
+    def append(self, target, data):
+        "Append data into target"
+        return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
+
+    def prepend(self, target, data):
+        return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
+
+    def render_string(self, template_name, **kwargs):
+        "Render the given template"
+        context_processors = getattr(settings, 'template_context_processors', [])
+        template_args = {'reverse_url': self.reverse_url}
+        for processor_path in context_processors:
+            path, name = processor_path.rsplit('.', 1)
+            processor_module = __import__(path, fromlist=path)
+            processor = getattr(processor_module, name)
+            template_args.update(processor(self, **kwargs))
+        template_args.update(kwargs)
+        html = self.site.loader.load(template_name).generate(**template_args)
+        return html
+
+    def render(self, target, template_name, **kwargs):
+        "Render into the target element (jQuery selector)"
+        html = self.render_string(template_name, **kwargs)
+        self.insert(target, html)
+        return self
+
 
 core_router = TornadioRouter(AiryCoreHandler)
