@@ -5,6 +5,12 @@ airy = {
     history: null,
     initialized: false,
 
+    defaults: {
+        'method': 'get',
+        'change_state': false,
+        'callback': null
+    },
+
     init: function() {
         if (!airy.initialized) {
             airy.history = window.History;
@@ -16,13 +22,25 @@ airy = {
         airy.request('get', airy.history.getState().hash);
     },
 
+    call: function(params) {
+        var options = $.extend({}, airy.defaults, params);
+        console.log(options);
+        if (airy.history.getState().hash == options.url || !options.change_state) {
+            var params = [options.method, options.url];
+            if (params.data)
+                $.merge(params, [data]);
+            if (typeof(options.callback) == "function")
+                $.merge(params, [options.callback]);
+            console.log(params);
+            airy.socket.emit.apply(airy.socket, params);
+        } else {
+            airy.history.pushState(options, null, options.url);
+        }
+    },
+
     request: function(method, url, data, nostate) {
         if (airy.history.getState().hash == url || nostate) {
-            if (data) {
-                airy.socket.emit(method, url, data);
-            } else {
-                airy.socket.emit(method, url);
-            }
+            airy.call({method: method, url: url, data: data, change_state: !nostate});
         } else {
             airy.history.pushState({method: method, data: data}, null, url);
         }
@@ -51,11 +69,7 @@ airy = {
         history: function() {
             airy.history.Adapter.bind(window, 'statechange', function() {
                 var State = airy.history.getState();
-                if (State.data.data) {
-                    airy.socket.emit(State.data.method, State.hash, State.data.data);
-                } else {
-                    airy.socket.emit(State.data.method, State.hash);
-                }
+                airy.call({method: State.data.method, url: State.hash, data: State.data.data, change_state: State.data.change_state});
             });
         },
         links: function() {

@@ -580,7 +580,7 @@ class AiryCoreHandler(SocketConnection):
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
             try:
-                handler.get(*hargs, **hkwargs)
+                return handler.get(*hargs, **hkwargs)
             except Http404:
                 self.process_404(*hargs, **hkwargs)
         else:
@@ -610,7 +610,7 @@ class AiryCoreHandler(SocketConnection):
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
             try:
-                handler.post(*hargs, **hkwargs)
+                return handler.post(*hargs, **hkwargs)
             except Http404:
                 self.process_404(*hargs, **hkwargs)
         else:
