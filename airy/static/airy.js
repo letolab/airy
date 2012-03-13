@@ -110,7 +110,7 @@ airy = {
 
 $(function() {
 
-    airy.socket = new io.connect("http://" + window.location.host);
+    airy.socket = new io.connect("http://" + window.location.host, {'connect timeout': 1000});
 
     airy.socket.on('connect', function() {
         airy.init();
