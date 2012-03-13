@@ -24,14 +24,12 @@ airy = {
 
     call: function(params) {
         var options = $.extend({}, airy.defaults, params);
-        console.log(options);
         if (airy.history.getState().hash == options.url || !options.change_state) {
             var params = [options.method, options.url];
-            if (params.data)
-                $.merge(params, [data]);
+            if (options.data)
+                $.merge(params, [options.data]);
             if (typeof(options.callback) == "function")
                 $.merge(params, [options.callback]);
-            console.log(params);
             airy.socket.emit.apply(airy.socket, params);
         } else {
             airy.history.pushState(options, null, options.url);
@@ -39,6 +37,7 @@ airy = {
     },
 
     request: function(method, url, data, nostate) {
+        // deprecated functionality
         if (airy.history.getState().hash == url || nostate) {
             airy.call({method: method, url: url, data: data, change_state: !nostate});
         } else {
