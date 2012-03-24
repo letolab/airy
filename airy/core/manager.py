@@ -16,10 +16,7 @@ class CommandManager(dict):
 
     def load(self, project_root):
         for appname in settings.installed_apps:
-            try:
-                __import__(appname, fromlist=['%s.models'%appname])
-            except ImportError:
-                pass
+            __import__(appname, fromlist=['%s.models'%appname])
 
 command_manager = CommandManager()
 
