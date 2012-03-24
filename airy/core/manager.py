@@ -17,16 +17,15 @@ class CommandManager(dict):
     def load(self, project_root):
         for appname in settings.installed_apps:
             try:
-                models = __import__('%s.models' % appname, fromlist=['%s.models'%appname])
+                __import__(appname, fromlist=['%s.models'%appname])
             except ImportError:
                 pass
 
-
-commands = CommandManager()
+command_manager = CommandManager()
 
 def execute(project_root, argv):
     _preconfigure(project_root, argv=argv[1:])
-    commands.load(project_root)
+    command_manager.load(project_root)
 
     if len(argv) <= 1:
         print 'Please provide a command.'
@@ -38,8 +37,8 @@ def execute(project_root, argv):
         import tornado.options
         tornado.options.print_help()
     else:
-        if argv[1] in commands:
-            commands[argv[1]](*argv[2:])
+        if argv[1] in command_manager:
+            command_manager[argv[1]](*argv[2:])
         else:
             print "Error: unknown command '%s'" % argv[1]
 
