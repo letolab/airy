@@ -8,8 +8,25 @@ import os
 
 AIRY_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
 
+class CommandManager(dict):
+    def __init__(self, *args, **kwargs):
+        super(CommandManager, self).__init__(*args, **kwargs)
+        for k,v in kwargs.items():
+            self[k] = v
+
+    def load(self, project_root):
+        for appname in settings.installed_apps:
+            try:
+                models = __import__('%s.models' % appname, fromlist=['%s.models'%appname])
+            except ImportError:
+                pass
+
+
+commands = CommandManager()
+
 def execute(project_root, argv):
     _preconfigure(project_root, argv=argv[1:])
+    commands.load(project_root)
 
     if len(argv) <= 1:
         print 'Please provide a command.'
@@ -21,7 +38,10 @@ def execute(project_root, argv):
         import tornado.options
         tornado.options.print_help()
     else:
-        print "Error: unknown command '%s'" % argv[1]
+        if argv[1] in commands:
+            commands[argv[1]](*argv[2:])
+        else:
+            print "Error: unknown command '%s'" % argv[1]
 
 
 def shell():
