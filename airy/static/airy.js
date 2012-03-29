@@ -124,10 +124,10 @@ airy = {
 
     util: {
         fix_url: function(url) {
-            if (url[0] == ".") {
+            if (url.indexOf('.') == 0) {
                 url = url.substring(1);
             }
-            if (url[0] != "/") {
+            if (url.indexOf('/') != 0) {
                 url = "/"+url;
             }
             return url;
