@@ -24,15 +24,17 @@ airy = {
 
     call: function(params) {
         var options = $.extend({}, airy.defaults, params);
-        if (airy.history.getState().hash == options.url || !options.change_state) {
-            var params = [options.method, options.url];
+        var url = airy.util.fix_url(airy.history.getState().hash);
+        options.url = airy.util.fix_url(options.url);
+        if (url == options.url || !options.change_state) {
+            var params = [options.method, url];
             if (options.data)
                 $.merge(params, [options.data]);
             if (typeof(options.callback) == "function")
                 $.merge(params, [options.callback]);
             airy.socket.emit.apply(airy.socket, params);
         } else {
-            airy.history.pushState(options, null, options.url);
+            airy.history.pushState(options, null, url);
         }
     },
 
@@ -117,6 +119,18 @@ airy = {
         no_state_change: function(item) {
             // when true airy will attempt to change the URL
             return $(item).hasClass('no-airy-state');
+        }
+    },
+
+    util: {
+        fix_url: function(url) {
+            if (url[0] == ".") {
+                url = url.substring(1);
+            }
+            if (url[0] != "/") {
+                url = "/"+url;
+            }
+            return url;
         }
     }
 }
