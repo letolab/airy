@@ -87,9 +87,14 @@ def linkify(text, shorten=False, extra_params="",
 
         return u'<a href="%s"%s>%s</a>' % (href, params, url)
 
+    splitted_text = re.split("""(<a.*?>.*?</a>)""", text)
+    for i in range(0, len(splitted_text), 2):
+        splitted_text[i] = _URL_RE.sub(make_link, splitted_text[i])
+
     # The regex is modified to avoid character entites other than &amp; so
     # that we won't pick up &quot;, etc.
-    return _URL_RE.sub(make_link, text)
+#    return _URL_RE.sub(make_link, text)
+    return ''.join(splitted_text)
 
 def sanitize(text):
     """
