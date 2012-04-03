@@ -5,6 +5,13 @@ import re
 
 _URL_RE = re.compile(ur"""\b((?:([\w-]+):(/{1,3})|www[.])(?:(?:(?:[^\s&()]|&amp;|&quot;)*(?:[^!"#$%&'()*+,.:;<=>?@\[\]^`{|}~\s]))|(?:\((?:[^\s&()]|&amp;|&quot;)*\)))+)""")
 
+_link_regexes = [
+    re.compile(r'(?P<body>https?://(?P<host>[a-z0-9._-]+)(?:/[/\-_.,a-z0-9%&?;=~]*)?(?:\([/\-_.,a-z0-9%&?;=~]*\))?)', re.I),
+    # This is conservative, but autolinking can be a bit conservative:
+    re.compile(r'mailto:(?P<body>[a-z0-9._-]+@(?P<host>[a-z0-9_._]+[a-z]))', re.I),
+    re.compile(r'(?P<body>www\.(?P<host>[a-z0-9._-]+)(?:/[/\-_.,a-z0-9%&?;=~]*)?(?:\([/\-_.,a-z0-9%&?;=~]*\))?)', re.I),
+    ]
+
 def linebreaks(text):
     """
     Turns every new-line ("\n") into a "<br />" HTML tag.
@@ -86,6 +93,13 @@ def linkify(text, shorten=False, extra_params="",
                     params += ' title="%s"' % href
 
         return u'<a href="%s"%s>%s</a>' % (href, params, url)
+
+    try:
+        from lxml.html.clean import autolink_html
+        text = text.replace('www.', 'http://www.')
+        return autolink_html(text, _link_regexes)
+    except ImportError:
+        pass
 
     splitted_text = re.split("""(<a.*?>.*?</a>)""", text)
     for i in range(0, len(splitted_text), 2):
