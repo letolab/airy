@@ -477,6 +477,12 @@ class AiryHandler(object):
         """
         return self.execute('airy.ui.remove("%s")' % target)
 
+    def set_title(self, text):
+        """
+        Set page title to ``text``.
+        """
+        return self.execute('airy.ui.title("%s")' % text)
+
     def render_string(self, template_name, **kwargs):
         """
         Render the template specified in ``template_name``.
@@ -653,6 +659,10 @@ class AiryCoreHandler(SocketConnection):
 
     def prepend(self, target, data):
         return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
+
+    def set_title(self, text):
+        return self.execute('airy.ui.title("%s");' % text)
+
 
     def render_string(self, template_name, **kwargs):
         "Render the given template"
