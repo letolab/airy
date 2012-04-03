@@ -96,7 +96,7 @@ def linkify(text, shorten=False, extra_params="",
 
     try:
         from lxml.html.clean import autolink_html
-        text = text.replace('www.', 'http://www.')
+        text = text.replace('http://www.', 'www.').replace('www.', 'http://www.')
         return autolink_html(text, _link_regexes)
     except ImportError:
         pass

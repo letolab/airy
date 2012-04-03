@@ -132,10 +132,24 @@ class AiryRequestHandler(RequestHandler):
         return super(AiryRequestHandler, self).render_string(template_name, **template_args)
 
     def is_robot(self, *args, **kwargs):
-        robots = ['Googlebot', ]
+        robots = [
+            'facebook',
+            'postrank',
+            'voyager',
+            'twitterbot',
+            'googlebot',
+            'slurp',
+            'butterfly',
+            'pycurl',
+            'tweetmemebot',
+            'metauri',
+            'evrinid',
+            'reddit',
+            'digg',
+        ]
         robots.extend(args)
         for robot in robots:
-            if robot in self.request.headers['User-Agent']:
+            if robot.lower() in self.request.headers['User-Agent'].lower():
                 return True
         return False
 

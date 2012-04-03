@@ -38,6 +38,10 @@ def bot_friendly(func):
             document.remove(fragment)
             obj.HTML = tostring(document)
 
+        def set_title(text):
+            document = document_fromstring(obj.HTML)
+            document.findall('.//title')[0].text = text
+
         if obj.is_robot():
             obj.HTML = obj.render_string("page.html")
             uri = obj.request.uri
@@ -49,6 +53,7 @@ def bot_friendly(func):
             handler.remove = remove
             handler.render = render
             handler.prepend = prepend
+            handler.set_title = set_title
             handler.get(*hargs, **hkwargs)
 
             HTML = obj.HTML
