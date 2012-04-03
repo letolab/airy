@@ -1,6 +1,7 @@
 from airy.core.conf import settings
 from airy.core.exceptions import Http404
 from airy.core.files.uploadedfile import SimpleUploadedFile
+from airy.utils.encoding import smart_unicode
 from tornado.web import *
 from tornado.escape import *
 from tornadio2 import TornadioRouter, SocketConnection, event
@@ -122,7 +123,7 @@ class AiryRequestHandler(RequestHandler):
 
     def render_string(self, template_name, **kwargs):
         context_processors = getattr(settings, 'template_context_processors', [])
-        template_args = {'reverse_url': self.reverse_url}
+        template_args = {'reverse_url': self.reverse_url, "_utf8": utf8}
         for processor_path in context_processors:
             path, name = processor_path.rsplit('.', 1)
             processor_module = __import__(path, fromlist=path)
@@ -527,7 +528,7 @@ class AiryHandler(object):
 
         """
         context_processors = getattr(settings, 'template_context_processors', [])
-        template_args = {'reverse_url': self.reverse_url}
+        template_args = {'reverse_url': self.reverse_url,  "_utf8": utf8}
         for processor_path in context_processors:
             path, name = processor_path.rsplit('.', 1)
             processor_module = __import__(path, fromlist=path)
@@ -696,6 +697,19 @@ class AiryCoreHandler(SocketConnection):
         html = self.render_string(template_name, **kwargs)
         self.insert(target, html)
         return self
+
+def utf8(value):
+    """Converts a string argument to a byte string.
+
+    If the argument is already a byte string or None, it is returned unchanged.
+    Otherwise it must be a unicode string and is encoded as utf8.
+    """
+    if isinstance(value, _UTF8_TYPES):
+        return value
+    assert isinstance(value, unicode)
+    return smart_unicode(value, encoding="utf-8", errors="ignore")
+
+_UTF8_TYPES = (bytes, type(None))
 
 
 core_router = TornadioRouter(AiryCoreHandler)
