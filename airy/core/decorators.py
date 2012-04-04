@@ -41,6 +41,7 @@ def bot_friendly(func):
         def set_title(text):
             document = document_fromstring(obj.HTML)
             document.findall('.//title')[0].text = text
+            obj.HTML = tostring(document)
 
         if obj.is_robot():
             obj.HTML = obj.render_string("page.html")
