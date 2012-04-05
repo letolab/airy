@@ -458,7 +458,7 @@ class AiryHandler(object):
 
 
         """
-        return self.execute('airy.request("get", "%s");' % url)
+        return self.execute('airy.call({url: "%s"});' % url)
 
     def insert(self, target, data):
         """
@@ -662,7 +662,7 @@ class AiryCoreHandler(SocketConnection):
         return self
 
     def redirect(self, url):
-        return self.execute('airy.request("get", "%s");' % url)
+        return self.execute('airy.call({url: "%s"});' % url)
 
     def insert(self, target, data):
         "Insert data into target"
