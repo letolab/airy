@@ -106,13 +106,17 @@ airy = {
 
     options: {
         is_airy_link: function(link) {
-            if (link.attr('href') && !link.attr('target') && !link.hasClass('no-airy')) {
+            if (link.attr('href').substring(0, 7) == "http://" || link.attr('href').substring(0, 7) == "https://") {
+                return false;
+            }
+            if (link.attr('href') && !link.attr('target') && !link.attr('nofollow') && !link.hasClass('no-airy')) {
                 return true;
             }
             return false;
         },
 
         is_airy_form: function(form) {
+            if (window.location.href.substring(0, 7) == 'http://')
             if (!form.hasClass('no-airy')) {
                 return true;
             }
