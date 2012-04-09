@@ -1,5 +1,6 @@
 "Virtualenv utils"
 import sys
+import os
 import subprocess
 import virtualenv
 import shutil
@@ -19,8 +20,14 @@ def check_ve(project_root, argv):
         if not ve_root in sys.prefix:
             retcode = 3
             while retcode == 3:
+                env = os.environ
                 if sys.platform == 'win32':
                     python = path.join(VE_ROOT, 'Scripts', 'python.exe')
+                elif sys.platform == 'darwin':
+                    # temporary fix for broken virtualenv in macports
+                    import airy
+                    env["PYTHONPATH"] = "%s:" % path.join(path.abspath(path.dirname(airy.__file__)), '..') + env.get('PYTHONPATH', '')
+                    python = path.join(VE_ROOT, 'bin', 'python')
                 else:
                     python = path.join(VE_ROOT, 'bin', 'python')
                 try:

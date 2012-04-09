@@ -2,6 +2,7 @@ from airy.core.conf import settings
 from airy.core.exceptions import Http404
 from airy.core.files.uploadedfile import SimpleUploadedFile
 from airy.core.reportbug import report_on_fail
+from airy.utils.encoding import smart_unicode
 from tornado.web import *
 from tornado.escape import *
 from tornadio2 import TornadioRouter, SocketConnection, event
@@ -123,7 +124,7 @@ class AiryRequestHandler(RequestHandler):
 
     def render_string(self, template_name, **kwargs):
         context_processors = getattr(settings, 'template_context_processors', [])
-        template_args = {'reverse_url': self.reverse_url}
+        template_args = {'reverse_url': self.reverse_url, "_utf8": utf8}
         for processor_path in context_processors:
             path, name = processor_path.rsplit('.', 1)
             processor_module = __import__(path, fromlist=path)
@@ -133,10 +134,24 @@ class AiryRequestHandler(RequestHandler):
         return super(AiryRequestHandler, self).render_string(template_name, **template_args)
 
     def is_robot(self, *args, **kwargs):
-        robots = ['Googlebot', ]
+        robots = [
+            'facebook',
+            'postrank',
+            'voyager',
+            'twitterbot',
+            'googlebot',
+            'slurp',
+            'butterfly',
+            'pycurl',
+            'tweetmemebot',
+            'metauri',
+            'evrinid',
+            'reddit',
+            'digg',
+        ]
         robots.extend(args)
         for robot in robots:
-            if robot in self.request.headers['User-Agent']:
+            if robot.lower() in self.request.headers['User-Agent'].lower():
                 return True
         return False
 
@@ -444,7 +459,7 @@ class AiryHandler(object):
 
 
         """
-        return self.execute('airy.request("get", "%s");' % url)
+        return self.execute('airy.call({url: "%s"});' % url)
 
     def insert(self, target, data):
         """
@@ -478,6 +493,12 @@ class AiryHandler(object):
         """
         return self.execute('airy.ui.remove("%s")' % target)
 
+    def set_title(self, text):
+        """
+        Set page title to ``text``.
+        """
+        return self.execute('airy.ui.title("%s")' % text)
+
     def render_string(self, template_name, **kwargs):
         """
         Render the template specified in ``template_name``.
@@ -508,7 +529,7 @@ class AiryHandler(object):
 
         """
         context_processors = getattr(settings, 'template_context_processors', [])
-        template_args = {'reverse_url': self.reverse_url}
+        template_args = {'reverse_url': self.reverse_url,  "_utf8": utf8}
         for processor_path in context_processors:
             path, name = processor_path.rsplit('.', 1)
             processor_module = __import__(path, fromlist=path)
@@ -582,7 +603,7 @@ class AiryCoreHandler(SocketConnection):
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
             try:
-                handler.get(*hargs, **hkwargs)
+                return handler.get(*hargs, **hkwargs)
             except Http404:
                 self.process_404(*hargs, **hkwargs)
         else:
@@ -613,7 +634,7 @@ class AiryCoreHandler(SocketConnection):
                                                       self.info.arguments.get('t', ''),
                                                       handler.__class__.__name__))
             try:
-                handler.post(*hargs, **hkwargs)
+                return handler.post(*hargs, **hkwargs)
             except Http404:
                 self.process_404(*hargs, **hkwargs)
         else:
@@ -634,6 +655,64 @@ class AiryCoreHandler(SocketConnection):
             handler_class(site, self).get()
         except AttributeError:
             logging.error('Page with url %s doesn\'t exist' % (kwargs.get('url', ''), ))
+
+    #
+    # Airy client interaction
+    #
+    def execute(self, data):
+        "Execute the given data on the client side"
+        self.emit('execute', data)
+        return self
+
+    def redirect(self, url):
+        return self.execute('airy.call({url: "%s"});' % url)
+
+    def insert(self, target, data):
+        "Insert data into target"
+        return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
+
+    def append(self, target, data):
+        "Append data into target"
+        return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
+
+    def prepend(self, target, data):
+        return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
+
+    def set_title(self, text):
+        return self.execute('airy.ui.title("%s");' % text)
+
+
+    def render_string(self, template_name, **kwargs):
+        "Render the given template"
+        context_processors = getattr(settings, 'template_context_processors', [])
+        template_args = {'reverse_url': self.reverse_url}
+        for processor_path in context_processors:
+            path, name = processor_path.rsplit('.', 1)
+            processor_module = __import__(path, fromlist=path)
+            processor = getattr(processor_module, name)
+            template_args.update(processor(self, **kwargs))
+        template_args.update(kwargs)
+        html = self.site.loader.load(template_name).generate(**template_args)
+        return html
+
+    def render(self, target, template_name, **kwargs):
+        "Render into the target element (jQuery selector)"
+        html = self.render_string(template_name, **kwargs)
+        self.insert(target, html)
+        return self
+
+def utf8(value):
+    """Converts a string argument to a byte string.
+
+    If the argument is already a byte string or None, it is returned unchanged.
+    Otherwise it must be a unicode string and is encoded as utf8.
+    """
+    if isinstance(value, _UTF8_TYPES):
+        return value
+    assert isinstance(value, unicode)
+    return smart_unicode(value, encoding="utf-8", errors="ignore")
+
+_UTF8_TYPES = (bytes, type(None))
 
 
 core_router = TornadioRouter(AiryCoreHandler)
