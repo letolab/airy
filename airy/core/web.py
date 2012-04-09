@@ -1,6 +1,7 @@
 from airy.core.conf import settings
 from airy.core.exceptions import Http404
 from airy.core.files.uploadedfile import SimpleUploadedFile
+from airy.core.reportbug import report_on_fail
 from tornado.web import *
 from tornado.escape import *
 from tornadio2 import TornadioRouter, SocketConnection, event
@@ -568,6 +569,7 @@ class AiryCoreHandler(SocketConnection):
         return parsed.scheme, parsed.netloc, parsed.path, arguments
 
     @event('get')
+    @report_on_fail
     def get(self, url, *args, **kwargs):
         "Main entry point for WebSocket requests"
         (scheme, host, path, arguments) = self.parse_url(url)
@@ -589,6 +591,7 @@ class AiryCoreHandler(SocketConnection):
             self.process_404(*hargs, **hkwargs)
 
     @event('post')
+    @report_on_fail
     def post(self, url, *args, **kwargs):
         "Main entry point for WebSocket requests"
         (scheme, host, path, arguments) = self.parse_url(url)
