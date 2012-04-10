@@ -76,6 +76,17 @@ def _ensure_defaults(dsettings, options, project_root, config_filename):
     dsettings['use_i18n'] = True
     dsettings['use_l10n'] = True
     dsettings['language_code'] = 'en-us'
+    dsettings['default_charset'] = 'utf-8'
+
+    # email
+    dsettings['email_backend'] = 'airy.core.mail.backends.smtp.EmailBackend'
+    dsettings['email_host'] = 'localhost'
+    dsettings['email_host_post'] = 25
+    dsettings['email_host_user'] = ''
+    dsettings['email_host_password'] = ''
+    dsettings['email_use_tls'] = False
+    dsettings['email_subject_prefix'] = '[Airy] '
+    dsettings['server_email'] = 'root@localhost'
 
     # settings
     dsettings['project_root'] = project_root
