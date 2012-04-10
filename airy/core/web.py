@@ -656,6 +656,10 @@ class AiryCoreHandler(SocketConnection):
         except AttributeError:
             logging.error('Page with url %s doesn\'t exist' % (kwargs.get('url', ''), ))
 
+    def reverse_url(self, name, *args):
+        """Alias for `Application.reverse_url`."""
+        return self.application.reverse_url(name, *args)
+
     #
     # Airy client interaction
     #
@@ -683,7 +687,6 @@ class AiryCoreHandler(SocketConnection):
 
     def set_title(self, text):
         return self.execute('airy.ui.title("%s");' % text)
-
 
     def render_string(self, template_name, **kwargs):
         "Render the given template"
