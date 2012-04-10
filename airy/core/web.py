@@ -458,7 +458,7 @@ class AiryHandler(object):
 
 
         """
-        return self.execute('airy.call({url: "%s"});' % url)
+        return self.execute('airy.ui.redirect("%s");' % url)
 
     def insert(self, target, data):
         """
@@ -579,8 +579,10 @@ class AiryCoreHandler(SocketConnection):
         logging.info('Socket Connected: %s %s' % (self.info.ip, self.info.arguments.get('t', '')))
         site.connections.add(self)
 
+    @event('set_state')
     def set_state(self, state):
-        self.state = state
+        (scheme, host, path, arguments) = self.parse_url(state)
+        self.state = path
 
     def parse_url(self, url):
         "Returns a tuple in the form (scheme, host, path, arguments)"
@@ -592,7 +594,6 @@ class AiryCoreHandler(SocketConnection):
     def get(self, url, *args, **kwargs):
         "Main entry point for WebSocket requests"
         (scheme, host, path, arguments) = self.parse_url(url)
-        self.set_state(path)
         handler, hargs, hkwargs = site.resolve_url(path, self, arguments=arguments)
         hargs.extend(args)
         hkwargs.update(kwargs)
@@ -622,7 +623,6 @@ class AiryCoreHandler(SocketConnection):
         except:
             data = {}
         arguments.update(data)
-        self.set_state(path)
         handler, hargs, hkwargs = site.resolve_url(path, self, arguments=arguments)
         hargs.extend(args)
         hkwargs.update(kwargs)
@@ -662,7 +662,7 @@ class AiryCoreHandler(SocketConnection):
         return self
 
     def redirect(self, url):
-        return self.execute('airy.call({url: "%s"});' % url)
+        return self.execute('airy.ui.redirect("%s");' % url)
 
     def insert(self, target, data):
         "Insert data into target"
@@ -674,6 +674,9 @@ class AiryCoreHandler(SocketConnection):
 
     def prepend(self, target, data):
         return self.execute('airy.ui.prepend("%s", %s);' % (target, json_encode(data)))
+
+    def remove(self, target):
+        return self.execute('airy.ui.remove("%s")' % target)
 
     def set_title(self, text):
         return self.execute('airy.ui.title("%s");' % text)

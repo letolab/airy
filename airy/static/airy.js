@@ -20,6 +20,7 @@ airy = {
             airy.initialized = true;
         }
         airy.request('get', airy.history.getState().hash);
+        airy.socket.emit('set_state', airy.history.getState().hash);
     },
 
     call: function(params) {
@@ -66,6 +67,9 @@ airy = {
         },
         title: function(text) {
             document.title = text;
+        },
+        redirect: function(url) {
+            airy.history.pushState({}, null, url);
         }
     },
 
@@ -73,7 +77,8 @@ airy = {
         history: function() {
             airy.history.Adapter.bind(window, 'statechange', function() {
                 var State = airy.history.getState();
-                airy.call({method: State.data.method, url: State.hash, data: State.data.data, change_state: State.data.change_state});
+                airy.call({method: State.data.method, url: State.hash, data: State.data.data, change_state: false});
+                airy.socket.emit('set_state', State.hash);
             });
         },
         links: function() {
@@ -106,6 +111,9 @@ airy = {
 
     options: {
         is_airy_link: function(link) {
+            if (!link.attr('href')) {
+                return false;
+            }
             if (link.attr('href').substring(0, 7) == "http://" || link.attr('href').substring(0, 7) == "https://") {
                 return false;
             }
