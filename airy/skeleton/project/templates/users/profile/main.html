@@ -3,7 +3,7 @@
 {% set current_user = user %}
 
 <div class="row">
-    <div class="three columns">
+    <div class="span3">
         <div class="profile-picture-box">
             <div id="profile-picture">
                 {% include 'picture.html' %}
@@ -19,7 +19,7 @@
         <div class="clear"></div>
     </div>
 
-    <div class="six columns">
+    <div class="span8">
         <h3>
             <span field="first_name" class="content-editable">{{ user.first_name }}</span>
             <span field="last_name" class="content-editable">{{ user.last_name }}</span>

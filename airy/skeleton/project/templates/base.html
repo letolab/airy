@@ -8,10 +8,12 @@
 	<!-- Set the viewport width to device width for mobile -->
 	<meta name="viewport" content="width=device-width" />
 	
-    <title>{% block title %}Home{% end %}</title>
+    <title>{% block title %}Home{% end %} | UnBallPark</title>
 
 	<!-- CSS Files -->
-	<link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/foundation.css" />
+	<!--<link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/foundation.css" />-->
+    <!--<link rel="stylesheet" type="text/css" media="all" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" />-->
+    <link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/bootstrap.css" />
     <link rel="stylesheet" type="text/css" media="all" href="/static/stylesheets/style.css" />
 	<!--[if lt IE 9]>
 		<link rel="stylesheet" href="/static/stylesheets/ie.css">
@@ -39,7 +41,7 @@
     <div id="page" class="container">
         <div class="row">
             {% block topmenu %}{% end %}
-            <div class="twelve columns">
+            <div class="span12">
                 {% block page_content %}{% end %}
             </div>
         </div>

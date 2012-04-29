@@ -5,6 +5,11 @@ import sys
 
 PROJECT_ROOT = path.abspath(path.dirname(__file__))
 
+# test params
+import sys
+sys.path.insert(0, path.join(PROJECT_ROOT, '../airy/'))
+# end test
+
 # Airy run engine
 
 def main():

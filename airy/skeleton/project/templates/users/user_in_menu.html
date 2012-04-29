@@ -1,14 +1,22 @@
-<li>
-    <a href="/" class="main">Home</a>
-</li>
-<li>
-    <a href="/accounts/profile">
-    {% if user.picture_url %}
-    <img src="{{ user.picture_url }}" class="profile-picture-icon menu-icon" alt=""/>
-    {% else %}
-    <img src="/static/images/profile-default-icon.png" class="profile-picture-icon menu-icon" alt=""/>
-    {% end %}
-    {{ user.username[:14] }}{% if len(user.username) > 14 %}...{% end %}
-    </a>
-</li>
-<li><a href="/accounts/logout">Log out</a></li>
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="container">
+            <ul class="nav">
+                <li>
+                    <a href="/" class="main">Home</a>
+                </li>
+                <li>
+                    <a href="/accounts/profile">
+                    {% if user.picture_url %}
+                    <img src="{{ user.picture_url }}" class="profile-picture-icon menu-icon" alt=""/>
+                    {% else %}
+                    <img src="/static/images/profile-default-icon.png" class="profile-picture-icon menu-icon" alt=""/>
+                    {% end %}
+                    {{ user.username[:14] }}{% if len(user.username) > 14 %}...{% end %}
+                    </a>
+                </li>
+                <li><a href="/accounts/logout">Log out</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
