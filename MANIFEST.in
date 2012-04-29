@@ -1,2 +1,4 @@
 recursive-include airy/skeleton *
+prune airy/skeleton *.pyc
 recursive-include airy/static *
+prune airy/skeleton *.pyc
