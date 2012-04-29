@@ -55,8 +55,8 @@ def check_ve(project_root, argv):
                 file(VE_TIMESTAMP, 'w').close()
             sys.exit(0)
         else:
-            print "VirtualEnv need to be updated"
-            print "Run ./manage.py update_ve"
+            print "VirtualEnv needs to be updated"
+            print "Run 'python manage.py update_ve'"
             sys.exit(1)
 
     go_to_ve(VE_ROOT)

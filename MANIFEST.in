@@ -1,4 +1,2 @@
-recursive-include airy/skeleton *
-prune airy/skeleton *.pyc
+recursive-include airy/skeleton *.py *.html *.css *.js *.png *.jpg *.xml README
 recursive-include airy/static *
-prune airy/skeleton *.pyc
