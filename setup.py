@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
     name = "airy",
-    version = "0.1.2",
+    version = "0.1.3",
     author = "LetoLab Ltd",
     author_email = "team@letolab.com",
     description = ("Web Application Framework"),
