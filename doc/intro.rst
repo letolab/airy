@@ -35,8 +35,7 @@ Please refer to the `MongoEngine Documentation <http://mongoengine.org/docs/>`_ 
 Interface
 ---------
 
-By default, Airy includes `Foundation CSS Framework <http://foundation.zurb.com/>`_ (by `ZURB <http://www.zurb.com/>`_) in every new project. This will become
-optional in future releases and we will also add support for `Twitter Bootstrap <http://twitter.github.com/bootstrap/>`_
+By default, Airy includes `Twitter Bootstrap <http://twitter.github.com/bootstrap/>`_
 
 Airy also includes a small JavaScript library that is responsible for establishing initial Socket.io connection.
 Additionally, it modifies web page content and sends all requests via the connection instead of initiating a plain HTTP request.
