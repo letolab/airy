@@ -114,9 +114,6 @@ airy = {
             if (!link.attr('href')) {
                 return false;
             }
-            if (link.attr('href').substring(0, 7) == "http://" || link.attr('href').substring(0, 7) == "https://") {
-                return false;
-            }
             if (link.attr('href') && !link.attr('target') && !link.attr('nofollow') && !link.hasClass('no-airy')) {
                 return true;
             }
