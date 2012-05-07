@@ -1,3 +1,4 @@
+import copy
 from tornado.escape import to_unicode
 from airy.utils.html import strip_tags
 import logging
@@ -12,13 +13,144 @@ _link_regexes = [
     re.compile(r'(?P<body>www\.(?P<host>[a-z0-9._-]+)(?:/[/\-_.,a-z0-9%&?;=~]*)?(?:\([/\-_.,a-z0-9%&?;=~]*\))?)', re.I),
     ]
 
+_avoid_elements = ['textarea', 'pre', 'code', 'head', 'select', 'a']
+
+_avoid_hosts = [
+    re.compile(r'^localhost', re.I),
+    re.compile(r'\bexample\.(?:com|org|net)$', re.I),
+    re.compile(r'^127\.0\.0\.1$'),
+    ]
+
+_avoid_classes = ['nolink']
+
+
+def _link_text(text, link_regexes, avoid_hosts, factory, extra_params={}):
+    leading_text = ''
+    links = []
+    last_pos = 0
+    while 1:
+        best_match, best_pos = None, None
+        for regex in link_regexes:
+            regex_pos = last_pos
+            while 1:
+                match = regex.search(text, pos=regex_pos)
+                if match is None:
+                    break
+                host = match.group('host')
+                for host_regex in avoid_hosts:
+                    if host_regex.search(host):
+                        regex_pos = match.end()
+                        break
+                else:
+                    break
+            if match is None:
+                continue
+            if best_pos is None or match.start() < best_pos:
+                best_match = match
+                best_pos = match.start()
+        if best_match is None:
+            # No more matches
+            if links:
+                assert not links[-1].tail
+                links[-1].tail = text
+            else:
+                assert not leading_text
+                leading_text = text
+            break
+        link = best_match.group(0)
+        end = best_match.end()
+        if link.endswith('.') or link.endswith(','):
+            # These punctuation marks shouldn't end a link
+            end -= 1
+            link = link[:-1]
+        prev_text = text[:best_match.start()]
+        if links:
+            assert not links[-1].tail
+            links[-1].tail = prev_text
+        else:
+            assert not leading_text
+            leading_text = prev_text
+        anchor = factory('a')
+        anchor.set('href', link)
+        body = best_match.group('body')
+        if not body:
+            body = link
+        if body.endswith('.') or body.endswith(','):
+            body = body[:-1]
+        anchor.text = body
+        if extra_params:
+            anchor.attrib.update(extra_params)
+        links.append(anchor)
+        text = text[end:]
+    return leading_text, links
+
+
+def _autolink(el, link_regexes=_link_regexes,
+             avoid_elements=_avoid_elements,
+             avoid_hosts=_avoid_hosts,
+             avoid_classes=_avoid_classes,
+             extra_params={}):
+    """
+    Turn any URLs into links.
+
+    It will search for links identified by the given regular
+    expressions (by default mailto and http(s) links).
+
+    It won't link text in an element in avoid_elements, or an element
+    with a class in avoid_classes.  It won't link to anything with a
+    host that matches one of the regular expressions in avoid_hosts
+    (default localhost and 127.0.0.1).
+
+    If you pass in an element, the element's tail will not be
+    substituted, only the contents of the element.
+    """
+    if el.tag in avoid_elements:
+        return
+    class_name = el.get('class')
+    if class_name:
+        class_name = class_name.split()
+        for match_class in avoid_classes:
+            if match_class in class_name:
+                return
+    for child in list(el):
+        _autolink(child, link_regexes=link_regexes,
+            avoid_elements=avoid_elements,
+            avoid_hosts=avoid_hosts,
+            avoid_classes=avoid_classes)
+        if child.tail:
+            text, tail_children = _link_text(
+                child.tail, link_regexes, avoid_hosts, factory=el.makeelement, extra_params=extra_params)
+            if tail_children:
+                child.tail = text
+                index = el.index(child)
+                el[index+1:index+1] = tail_children
+    if el.text:
+        text, pre_children = _link_text(
+            el.text, link_regexes, avoid_hosts, factory=el.makeelement, extra_params=extra_params)
+        if pre_children:
+            el.text = text
+            el[:0] = pre_children
+
+
+def _autolink_html(html, *args, **kw):
+    import lxml.html
+    result_type = type(html)
+    if isinstance(html, basestring):
+        doc = lxml.html.fromstring(html)
+    else:
+        doc = copy.deepcopy(html)
+    _autolink(doc, *args, **kw)
+    return lxml.html._transform_result(result_type, doc)
+
+
 def linebreaks(text):
     """
     Turns every new-line ("\n") into a "<br />" HTML tag.
     """
     return to_unicode(text).replace('\n', '<br />')
 
-def linkify(text, shorten=False, extra_params="",
+
+def linkify(text, shorten=False, extra_params={"target": "_blank", "rel": "nofollow"},
             require_protocol=False, permitted_protocols=["http", "https"]):
     """Converts plain text into HTML with links.
 
@@ -30,7 +162,7 @@ def linkify(text, shorten=False, extra_params="",
     shorten: Long urls will be shortened for display.
 
     extra_params: Extra text to include in the link tag,
-        e.g. linkify(text, extra_params='rel="nofollow" class="external"')
+        e.g. linkify(text, extra_params={'rel': "nofollow", 'class': "external"})
 
     require_protocol: Only linkify urls which include a protocol. If this is
         False, urls such as www.facebook.com will also be linkified.
@@ -39,8 +171,6 @@ def linkify(text, shorten=False, extra_params="",
         e.g. linkify(text, permitted_protocols=["http", "ftp", "mailto"]).
         It is very unsafe to include protocols such as "javascript".
     """
-    if extra_params:
-        extra_params = " " + extra_params.strip()
 
     def make_link(m):
         url = m.group(1)
@@ -55,7 +185,9 @@ def linkify(text, shorten=False, extra_params="",
         if not proto:
             href = "http://" + href   # no proto specified, use http
 
-        params = extra_params
+        params = ' '
+        if extra_params:
+            params += ' '.join(['%s="%s"' % (key, value) for key, value in extra_params.iteritems()])
 
         # clip long urls. max_len is just an approximation
         max_len = 30
@@ -95,9 +227,8 @@ def linkify(text, shorten=False, extra_params="",
         return u'<a href="%s"%s>%s</a>' % (href, params, url)
 
     try:
-        from lxml.html.clean import autolink_html
         text = text.replace('http://www.', 'www.').replace('www.', 'http://www.')
-        return autolink_html(text, _link_regexes)
+        return _autolink_html(text, _link_regexes, extra_params=extra_params)
     except ImportError:
         pass
 
