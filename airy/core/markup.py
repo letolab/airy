@@ -15,6 +15,8 @@ _link_regexes = [
 
 _avoid_elements = ['textarea', 'pre', 'code', 'head', 'select', 'a']
 
+_force_update_params = ['a',]
+
 _avoid_hosts = [
     re.compile(r'^localhost', re.I),
     re.compile(r'\bexample\.(?:com|org|net)$', re.I),
@@ -105,6 +107,8 @@ def _autolink(el, link_regexes=_link_regexes,
     substituted, only the contents of the element.
     """
     if el.tag in avoid_elements:
+        if extra_params and el.tag in _force_update_params:
+            el.attrib.update(extra_params)
         return
     class_name = el.get('class')
     if class_name:
@@ -116,7 +120,8 @@ def _autolink(el, link_regexes=_link_regexes,
         _autolink(child, link_regexes=link_regexes,
             avoid_elements=avoid_elements,
             avoid_hosts=avoid_hosts,
-            avoid_classes=avoid_classes)
+            avoid_classes=avoid_classes,
+            extra_params=extra_params)
         if child.tail:
             text, tail_children = _link_text(
                 child.tail, link_regexes, avoid_hosts, factory=el.makeelement, extra_params=extra_params)
