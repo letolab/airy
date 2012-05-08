@@ -68,6 +68,14 @@ airy = {
         title: function(text) {
             document.title = text;
         },
+        meta: {
+            description: function(text) {
+                var desc = $('head meta[name="description"]').first();
+                if (desc) {
+                    desc.attr('value', text);
+                }
+            }
+        },
         redirect: function(url) {
             airy.history.pushState({}, null, url);
         }

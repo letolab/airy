@@ -43,6 +43,14 @@ def bot_friendly(func):
             document.findall('.//title')[0].text = text
             obj.HTML = tostring(document)
 
+        def set_meta_description(text):
+            document = document_fromstring(obj.HTML)
+            try:
+                document.findall('.//head/meta[@name="description"]')[0].attrib['content'] = text
+            except IndexError:
+                pass
+            obj.HTML = tostring(document)
+
         if obj.is_robot():
             obj.HTML = obj.render_string("page.html")
             uri = obj.request.uri
@@ -55,6 +63,7 @@ def bot_friendly(func):
             handler.render = render
             handler.prepend = prepend
             handler.set_title = set_title
+            handler.set_meta_description = set_meta_description
             handler.get(*hargs, **hkwargs)
 
             HTML = obj.HTML

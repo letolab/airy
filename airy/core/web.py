@@ -499,6 +499,12 @@ class AiryHandler(object):
         """
         return self.execute('airy.ui.title("%s")' % text)
 
+    def set_meta_description(self, text):
+        """
+        Set page meta description to ``text``.
+        """
+        return self.execute('airy.ui.meta.description("%s")' % text)
+
     def render_string(self, template_name, **kwargs):
         """
         Render the template specified in ``template_name``.
