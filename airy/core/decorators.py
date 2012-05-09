@@ -6,16 +6,20 @@ def bot_friendly(func):
 
     def wrapped(obj, *args, **kwargs):
         from lxml.html import document_fromstring, tostring, fromstring
+        from lxml.etree import ParserError
         from airy.core.web import site
 
         def get_current_user():
             return None
 
         def render(target, template_name, **kwargs):
-            document = document_fromstring(obj.HTML)
-            fragment = fromstring(handler.render_string(template_name, **kwargs))
-            document.get_element_by_id(target[1:]).insert(0, fragment)
-            obj.HTML = tostring(document)
+            try:
+                document = document_fromstring(obj.HTML)
+                fragment = fromstring(handler.render_string(template_name, **kwargs))
+                document.get_element_by_id(target[1:]).insert(0, fragment)
+                obj.HTML = tostring(document)
+            except ParserError:
+                pass
 
         def append(target, data):
             document = document_fromstring(obj.HTML)
