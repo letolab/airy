@@ -3,13 +3,13 @@ from airy.core.mail import mail_admins
 
 def report_on_fail(function):
 
-    def wrapped(*args, **kwargs):
+    def wrapped(ins, *args, **kwargs):
         try:
-            return function(*args, **kwargs)
+            return function(ins, *args, **kwargs)
         except:
             if settings.debug:
                 raise
-            ReportBug()
+            ReportBug(ins, args=args, kwargs=kwargs)
 
     wrapped.__doc__ = function.__doc__
     wrapped.__name__ = function.__name__
@@ -17,7 +17,7 @@ def report_on_fail(function):
     return wrapped
 
 
-def ReportBug(handler=None):
+def ReportBug(handler=None, args=[], kwargs={}):
 
     import sys
     import traceback
@@ -26,18 +26,8 @@ def ReportBug(handler=None):
     # Mail the admins with the error
     exc_info = sys.exc_info()
 
-    if exc_info:
-        _file, _line, _func, _line = traceback.extract_tb(exc_info[2])[0]
-        _file = os.path.basename(_file)
-
-    else:
-        _file, _line, _func, _line = (None, None, None, None)
-
-    message = 'Exception in %s (line %s)' % (
-        _file,
-        _line
-        )
-    message += 'Traceback:\n%s\n\n' % ('\n'.join(traceback.format_exception(*exc_info)),)
+    message = u'\n\nargs:\n %s\n\nkwargs:\n%s\n\n' % (args, kwargs)
+    message += u'%s\n\n' % ('\n'.join(traceback.format_exception(*exc_info)),)
 
     exp = sys.exc_info()
 
