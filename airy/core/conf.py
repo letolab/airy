@@ -95,6 +95,11 @@ def _ensure_defaults(dsettings, options, project_root, config_filename):
     # formats
     dsettings['datetime_format'] = getattr(options, 'datetime_format', 'N j, Y, P')
     dsettings['time_format'] = getattr(options, 'time_format', 'P')
+    dsettings['date_input_formats'] = getattr(options, 'date_input_formats',
+        ('%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', '%b %d %Y',
+         '%b %d, %Y', '%d %b %Y', '%d %b, %Y', '%B %d %Y',
+         '%B %d, %Y', '%d %B %Y', '%d %B, %Y')
+    )
 
     return dsettings
 
