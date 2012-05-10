@@ -244,7 +244,7 @@ def linkify(text, shorten=False, extra_params={"target": "_blank", "rel": "nofol
     # The regex is modified to avoid character entites other than &amp; so
     # that we won't pick up &quot;, etc.
 #    return _URL_RE.sub(make_link, text)
-    return ''.join(splitted_text)
+    return to_unicode(''.join(splitted_text))
 
 def sanitize(text):
     """
@@ -259,7 +259,7 @@ def sanitize(text):
     """
     try:
         from airy.core import sanitizer
-        return sanitizer.clean_html(text)
+        return to_unicode(sanitizer.clean_html(text))
     except ImportError:
         logging.error("You need html5lib in order to use sanitize")
         return "ERROR: You need html5lib in order to use sanitize"
