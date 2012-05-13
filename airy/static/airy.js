@@ -164,7 +164,11 @@ $(function() {
     });
 
     airy.socket.on('execute', function(data) {
-        eval(data);
+        try {
+            eval(data);
+        } catch(err) {
+
+        }
     });
 
 });
