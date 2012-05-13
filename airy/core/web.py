@@ -727,4 +727,3 @@ def utf8(value):
 _UTF8_TYPES = (bytes, type(None))
 
 
-core_router = TornadioRouter(AiryCoreHandler)

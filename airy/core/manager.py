@@ -54,7 +54,8 @@ def run(project_root):
     ])
 
     # add Airy core handler
-    serverurls.extend(web.core_router.urls)
+    core_router = TornadioRouter(web.AiryCoreHandler, settings.__dict__)
+    serverurls.extend(core_router.urls)
 
     # add application handlers
     for appname in settings.installed_apps:
