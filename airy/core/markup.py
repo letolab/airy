@@ -1,6 +1,6 @@
 import copy
-from tornado.escape import to_unicode
 from airy.utils.html import strip_tags
+from airy.utils.encoding import smart_unicode
 import logging
 import re
 
@@ -152,7 +152,7 @@ def linebreaks(text):
     """
     Turns every new-line ("\n") into a "<br />" HTML tag.
     """
-    return to_unicode(text).replace('\n', '<br />')
+    return smart_unicode(text).replace('\n', '<br />')
 
 
 def linkify(text, shorten=False, extra_params={"target": "_blank", "rel": "nofollow"},
@@ -244,7 +244,7 @@ def linkify(text, shorten=False, extra_params={"target": "_blank", "rel": "nofol
     # The regex is modified to avoid character entites other than &amp; so
     # that we won't pick up &quot;, etc.
 #    return _URL_RE.sub(make_link, text)
-    return to_unicode(''.join(splitted_text))
+    return smart_unicode(''.join(splitted_text))
 
 def sanitize(text):
     """
@@ -259,7 +259,7 @@ def sanitize(text):
     """
     try:
         from airy.core import sanitizer
-        return to_unicode(sanitizer.clean_html(text))
+        return smart_unicode(sanitizer.clean_html(text))
     except ImportError:
         logging.error("You need html5lib in order to use sanitize")
         return "ERROR: You need html5lib in order to use sanitize"
