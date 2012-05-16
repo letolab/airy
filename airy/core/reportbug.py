@@ -31,7 +31,7 @@ def ReportBug(handler=None, args=[], kwargs={}):
 
     exp = sys.exc_info()
 
-    subject = str(exp[1])
+    subject = str(exp[1]).strip()
     text_content = message
     mail_admins(subject, text_content)
 
