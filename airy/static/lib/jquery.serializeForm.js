@@ -28,25 +28,9 @@ $(function () {
             callback(obj, data);
         }
 
-        // process files via File API
-        formFiles.each(function() {
-            var files = this.files;
-            var id = $(this).attr("name");
-
-            toArray(files).forEach(function(file) {
-                var fReader = new FileReader();
-
-                fReader.onload = function(e) {
-                    var result = e.target.result;
-                    appendFiles(id, {'name': file.name, 'content': result});
-                }
-
-                fReader.readAsDataURL(file);
-            });
-        });
-
         var elems = 0;
-        var inputs = formFiles.length
+        var inputs = formFiles.length;
+
         function appendFiles(id, arg) {
             obj[id] = arg;
             elems++;
@@ -54,6 +38,30 @@ $(function () {
                 callback(obj, data);
             }
         }
+
+        // process files via File API
+        formFiles.each(function() {
+            var files = this.files;
+            var id = $(this).attr("name");
+
+            if (toArray(files).length > 0) {
+
+                toArray(files).forEach(function(file) {
+                    var fReader = new FileReader();
+
+                    fReader.onload = function(e) {
+                        var result = e.target.result;
+                        appendFiles(id, {'name': file.name, 'content': result});
+                    }
+
+                    fReader.readAsDataURL(file);
+                });
+
+            } else {
+                appendFiles(id, null);
+            }
+
+        });
 
     }
 

@@ -253,7 +253,7 @@ class AiryHandler(object):
                 # Get rid of any weird control chars (unless decoding gave
                 # us bytes, in which case leave it alone)
                 v = re.sub(r"[\x00-\x08\x0e-\x1f]", " ", v)
-            if strip:
+            if strip and (isinstance(v, unicode) or isinstance(v, str)):
                 v = v.strip()
             values.append(v)
         return values
