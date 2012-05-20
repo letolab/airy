@@ -61,6 +61,22 @@ def send_mail(subject, message, from_email, recipient_list,
                         connection=connection).send()
 
 
+def send_mail_multipart(subject, message, from_email, recipient_list,
+                        fail_silently=False, connection=None,
+                        html_message=None, attachments=[]):
+    """Sends a multipart message."""
+    if not settings.ADMINS:
+        return
+    mail = EmailMultiAlternatives(subject,
+        message, from_email, recipient_list,
+        connection=connection)
+    if html_message:
+        mail.attach_alternative(html_message, 'text/html')
+    for filepath in attachments:
+        mail.attach_file(filepath)
+    mail.send(fail_silently=fail_silently)
+
+
 def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
                    auth_password=None, connection=None):
     """
