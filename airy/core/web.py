@@ -3,6 +3,7 @@ from airy.core.exceptions import Http404
 from airy.core.files.uploadedfile import SimpleUploadedFile
 from airy.core.reportbug import report_on_fail
 from airy.utils.encoding import smart_unicode
+from airy.utils.functional import curry
 from tornado.web import *
 from tornado.escape import *
 from tornadio2 import TornadioRouter, SocketConnection, event
@@ -11,11 +12,38 @@ from urllib2 import unquote
 import logging
 import base64
 
+
+class ConnectionSet(set):
+
+    def filter(self, **kwargs):
+        filtered_set = ConnectionSet(self)
+        for item in self:
+            for key, value in kwargs.iteritems():
+                try:
+                    key, tester = key.split('__', 1)
+                except ValueError:
+                    tester = None
+                if tester:
+                    condition = getattr(getattr(item, key), tester)(value)
+                else:
+                    condition = getattr(item, key) == value
+                if not condition:
+                    filtered_set = filtered_set - set(item)
+                    break
+        return filtered_set
+
+    def __getattr__(self, name):
+        def filtered_func(conn_set, name, *args, **kwargs):
+            for item in conn_set:
+                getattr(item, name)(*args, **kwargs)
+        return curry(filtered_func, self, name)
+
+
 class AirySite(object):
     """
     AirySite manages all current Socket.io connections and template loading.
     """
-    connections = set()
+    connections = ConnectionSet()
     application = None
     loader = None
 

@@ -48,10 +48,12 @@ $(function () {
                 $(this).iframePostForm({
                     'json': true,
                     'complete': function(response) {
-                        if (response.files) {
+                        if (!$.isEmptyObject(response.files)) {
                             for (name in response.files) {
                                 appendFiles(name, response.files[name]);
                             }
+                        } else {
+                            callback(obj, data);
                         }
                     }
                 })
