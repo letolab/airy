@@ -28,7 +28,8 @@ class ConnectionSet(set):
                 else:
                     condition = getattr(item, key) == value
                 if not condition:
-                    filtered_set = filtered_set - set(item)
+                    print filtered_set
+                    filtered_set = filtered_set - set([item])
                     break
         return filtered_set
 
@@ -730,7 +731,11 @@ class AiryCoreHandler(SocketConnection):
             path, name = processor_path.rsplit('.', 1)
             processor_module = __import__(path, fromlist=path)
             processor = getattr(processor_module, name)
-            template_args.update(processor(self, **kwargs))
+            try:
+               template_args.update(processor(self, **kwargs))
+            except:
+                # TODO: proper support for cookies/users
+                pass
         template_args.update(kwargs)
         html = self.site.loader.load(template_name).generate(**template_args)
         return html
