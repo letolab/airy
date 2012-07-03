@@ -713,6 +713,37 @@ class AiryCoreHandler(SocketConnection):
         self.insert(target, html)
         return self
 
+
+class FormProcessor(AiryRequestHandler):
+    """
+    Temporary form processor for old browsers with no FileAPI.
+
+    This seems to be the only way to support file uploads (facepalm)
+    """
+    def check_xsrf_cookie(self):
+        # don't check XSRF
+        pass
+
+    def post(self, *args, **kwargs):
+        args = self.get_flat_arguments()
+        args['files'] = {}
+        for file in self.request.files:
+            if len(self.request.files[file]) > 1:
+                for content in self.request.files[file]:
+                    args['files'][file] = {
+                        'content': '%s;%s,%s' % (content['content_type'], 'base64', base64.b64encode(content['body'])),
+                        'name': smart_unicode(content['filename'])
+                    }
+            else:
+                content = self.request.files[file][0]
+                args['files'][file] = {
+                    'content': '%s;%s,%s' % (content['content_type'], 'base64', base64.b64encode(content['body'])),
+                    'name': smart_unicode(content['filename'])
+                }
+        self.write(json_encode(args))
+        self.finish()
+
+
 def utf8(value):
     """Converts a string argument to a byte string.
 

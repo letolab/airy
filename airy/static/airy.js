@@ -106,12 +106,12 @@ airy = {
                     }
                     if ($(this).attr('method').toLowerCase() == 'get') {
                         airy.request('get', form_url+'?'+$(this).serialize(), null, airy.options.no_state_change($(this)));
+                        return false;
                     } else if ($(this).attr('method').toLowerCase() == 'post') {
-                        $(this).serializeForm(function(data, form) {
+                        return $(this).serializeForm(function(data, form) {
                             airy.request('post', form_url, data, airy.options.no_state_change(form));
                         }, $(this));
                     }
-                    return false;
                 }
             });
         }

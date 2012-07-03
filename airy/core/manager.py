@@ -50,6 +50,7 @@ def run(project_root):
 
     # add Airy static file handler
     serverurls.extend([
+        (r"/airy/form/", web.FormProcessor),
         (r"/airy/(.*)", tornado.web.StaticFileHandler, {"path": os.path.join(AIRY_ROOT, 'static')})
     ])
 
