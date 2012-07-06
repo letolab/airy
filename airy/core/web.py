@@ -28,7 +28,6 @@ class ConnectionSet(set):
                 else:
                     condition = getattr(item, key) == value
                 if not condition:
-                    print filtered_set
                     filtered_set = filtered_set - set([item])
                     break
         return filtered_set
