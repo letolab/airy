@@ -33,6 +33,11 @@ class ConnectionSet(set):
                     break
         return filtered_set
 
+    def remove(self, *args, **kwargs):
+        "Temporary fix to avoid conflict with parent's remove()"
+        for item in self:
+            item.remove(*args, **kwargs)
+
     def __getattr__(self, name):
         def filtered_func(conn_set, name, *args, **kwargs):
             for item in conn_set:
