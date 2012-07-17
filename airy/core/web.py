@@ -14,20 +14,46 @@ import base64
 
 
 class ConnectionSet(set):
+    """
+    A set of all active connections
+    """
+
+    def _get_filter_condition(self, item, key, value):
+        try:
+            key, tester = key.split('__', 1)
+        except ValueError:
+            tester = None
+        if tester:
+            if callable(getattr(getattr(item, key), tester)):
+                condition = getattr(getattr(item, key), tester)(value)
+            else:
+                condition = getattr(getattr(item, key), tester) == value
+        else:
+            condition = getattr(item, key) == value
+        return condition
 
     def filter(self, **kwargs):
         filtered_set = ConnectionSet(self)
         for item in self:
             for key, value in kwargs.iteritems():
-                try:
-                    key, tester = key.split('__', 1)
-                except ValueError:
-                    tester = None
-                if tester:
-                    condition = getattr(getattr(item, key), tester)(value)
-                else:
-                    condition = getattr(item, key) == value
+                condition = self._get_filter_condition(item, key, value)
                 if not condition:
+                    filtered_set = filtered_set - set([item])
+                    break
+        return filtered_set
+
+    def exclude(self, *args, **kwargs):
+        if len(args):
+            for conn in args:
+                if isinstance(conn, AiryHandler):
+                    kwargs['session__session_id'] = conn.connection.session.session_id
+                else:
+                    kwargs['session__session_id'] = conn.session.session_id
+        filtered_set = ConnectionSet(self)
+        for item in self:
+            for key, value in kwargs.iteritems():
+                condition = self._get_filter_condition(item, key, value)
+                if condition:
                     filtered_set = filtered_set - set([item])
                     break
         return filtered_set
