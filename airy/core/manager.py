@@ -42,6 +42,14 @@ def execute(project_root, argv):
 
 def shell():
     from IPython import embed
+
+    # add application handlers
+    for appname in settings.installed_apps:
+        try:
+            __import__('%s.models' % appname, fromlist=['%s.models'%appname])
+        except ImportError:
+            pass
+
     embed()
 
 def run(project_root):
