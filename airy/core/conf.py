@@ -109,7 +109,8 @@ def _preconfigure(project_root, config_filename='settings.py', argv=[]):
     tornado.options.parse_config_file(config_filename)
 
     dsettings = {}
-    for key in options._options:
+    parsed_options = getattr(options, '_options', options)
+    for key in parsed_options:
         dsettings[key] = getattr(options, key)
     
     _ensure_defaults(dsettings, options, project_root, config_filename)
