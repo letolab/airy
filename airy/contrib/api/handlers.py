@@ -24,6 +24,9 @@ class APIHandler(AiryRequestHandler):
         else:
             queryset = self.model.objects.filter(self.get_filter_query())
         queryset.update(**self.get_flat_arguments())
+        self.set_header("Content-Type", "application/json")
+        self.write(self.serializer().serialize(queryset))
+        self.finish()
 
     def post(self, id=None):
         if id:
@@ -32,6 +35,9 @@ class APIHandler(AiryRequestHandler):
         else:
             queryset = self.model(**self.get_flat_arguments())
             queryset.save()
+        self.set_header("Content-Type", "application/json")
+        self.write(self.serializer().serialize(queryset))
+        self.finish()
 
     def delete(self, id=None):
         if id:
@@ -39,3 +45,6 @@ class APIHandler(AiryRequestHandler):
         else:
             queryset = self.model.objects.filter(self.get_filter_query())
         queryset.delete()
+        self.set_header("Content-Type", "application/json")
+        self.write(self.serializer().serialize(queryset))
+        self.finish()
