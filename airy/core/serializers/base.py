@@ -2,6 +2,12 @@ from airy.core.db import *
 from mongoengine.queryset import QuerySet
 
 class BaseSerializer(object):
+    current_level = 0
+    levels = 0
+
+    def __init__(self, levels=1, *args, **kwargs):
+        self.levels = levels
+
     def to_python(self, obj):
         if isinstance(obj, QuerySet):
             return [self.to_python(item) for item in obj]
@@ -13,25 +19,37 @@ class BaseSerializer(object):
 
             return_data = []
 
-            for field_name in obj._fields:
+            self.current_level += 1
 
-                data = getattr(obj, field_name,  '')
-                field_type = obj._fields[field_name]
+            if self.levels and self.current_level > self.levels:
+                return_data.append(('id', str(obj.id)))
+                return_data.append(('__str__', obj.__unicode__()))
 
-                if isinstance(field_type, StringField):
-                    return_data.append((field_name, str(data)))
-                elif isinstance(field_type, FloatField):
-                    return_data.append((field_name, float(data)))
-                elif isinstance(field_type, IntField):
-                    return_data.append((field_name, int(data)))
-                elif isinstance(field_type, ListField):
-                    return_data.append((field_name, [self.to_python(item) for item in data]))
-                elif isinstance(field_type, ReferenceField):
-                    return_data.append((field_name, self.to_python(data)))
-                else:
-                    return_data.append((field_name, unicode(data)))
-                    # You can define your logic for returning elements
+            else:
+                for field_name in obj._fields:
+
+                    data = getattr(obj, field_name,  '')
+                    field_type = obj._fields[field_name]
+
+                    if isinstance(field_type, StringField):
+                        return_data.append((field_name, str(data)))
+                    elif isinstance(field_type, FloatField):
+                        return_data.append((field_name, float(data)))
+                    elif isinstance(field_type, IntField):
+                        return_data.append((field_name, int(data)))
+                    elif isinstance(field_type, ListField):
+                        return_data.append((field_name, [self.to_python(item) for item in data]))
+                    elif isinstance(field_type, ReferenceField):
+                        return_data.append((field_name, self.to_python(data)))
+                    else:
+                        return_data.append((field_name, unicode(data)))
+                        # You can define your logic for returning elements
+
+            self.current_level -= 1
 
             return dict(return_data)
 
-        return None
+        return {}
+
+    def serialize(self, queryset):
+        raise NotImplementedError
