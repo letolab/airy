@@ -32,7 +32,7 @@ class BaseSerializer(object):
                     field_type = obj._fields[field_name]
 
                     if isinstance(field_type, StringField):
-                        return_data.append((field_name, data.__unicode__()))
+                        return_data.append((field_name, unicode(data)))
                     elif isinstance(field_type, FloatField):
                         return_data.append((field_name, float(data)))
                     elif isinstance(field_type, IntField):
@@ -42,7 +42,7 @@ class BaseSerializer(object):
                     elif isinstance(field_type, ReferenceField):
                         return_data.append((field_name, self.to_python(data)))
                     else:
-                        return_data.append((field_name, data.__unicode__()))
+                        return_data.append((field_name, unicode(data)))
                         # You can define your logic for returning elements
 
             self.current_level -= 1
