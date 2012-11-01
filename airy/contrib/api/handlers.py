@@ -7,11 +7,11 @@ class APIHandler(AiryRequestHandler):
     serializer = JSONSerializer
 
     def get_filter_query(self):
-        return Q()
+        return Q(**self.get_flat_arguments())
 
     def get(self, id=None):
         if id:
-            queryset = self.model.objects.filter(self.get_filter_query()).get(pk=id)
+            queryset = self.model.objects.filter(self.get_filter_query()).get(id=id)
         else:
             queryset = self.model.objects.filter(self.get_filter_query())
         self.set_header("Content-Type", "application/json")
