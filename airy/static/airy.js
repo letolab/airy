@@ -65,6 +65,9 @@ airy = {
         remove: function(target) {
             $(target).remove();
         },
+        after: function(target, data) {
+            $(target).after(data);
+        },
         title: function(text) {
             document.title = text;
         },

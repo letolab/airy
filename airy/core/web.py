@@ -528,6 +528,16 @@ class AiryHandler(object):
         """
         return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
 
+
+    def after(self, target, data):
+        """
+        Append ``data`` after ``target``, where ``target`` is a jQuery selector.
+
+        This is an equivalent to jQuery $.after() function.
+        """
+        return self.execute('airy.ui.after("%s", %s);' % (target, json_encode(data)))
+
+
     def append(self, target, data):
         """
         Append ``data`` to ``target``, where ``target`` is a jQuery selector.
@@ -632,6 +642,11 @@ class AiryHandler(object):
         """
         html = self.render_string(template_name, **kwargs)
         self.insert(target, html)
+        return self
+
+    def render_after(self, target, template_name, **kwargs):
+        html = self.render_string(template_name, **kwargs)
+        self.after(target, html)
         return self
 
 
@@ -740,6 +755,10 @@ class AiryCoreHandler(SocketConnection):
         "Insert data into target"
         return self.execute('airy.ui.insert("%s", %s);' % (target, json_encode(data)))
 
+    def after(self, target, data):
+        "Add after the target"
+        return self.execute('airy.ui.after("%s", %s);' % (target, json_encode(data)))
+
     def append(self, target, data):
         "Append data into target"
         return self.execute('airy.ui.append("%s", %s);' % (target, json_encode(data)))
@@ -775,6 +794,12 @@ class AiryCoreHandler(SocketConnection):
         html = self.render_string(template_name, **kwargs)
         self.insert(target, html)
         return self
+
+    def render_after(self, target, template_name, **kwargs):
+        html = self.render_string(template_name, **kwargs)
+        self.after(target, html)
+        return self
+
 
 
 class FormProcessor(AiryRequestHandler):
