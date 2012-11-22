@@ -5,8 +5,13 @@ class BaseSerializer(object):
     current_level = 0
     levels = 0
 
-    def __init__(self, levels=1, *args, **kwargs):
+    fields = ()
+    exclude = ()
+
+    def __init__(self, levels=1, fields=(), exclude=(), *args, **kwargs):
         self.levels = levels
+        self.fields = fields
+        self.exclude = exclude
 
     def to_python(self, obj):
         if isinstance(obj, QuerySet):
@@ -23,10 +28,16 @@ class BaseSerializer(object):
 
             if self.levels and self.current_level > self.levels:
                 return_data.append(('id', str(obj.id)))
-                return_data.append(('__str__', obj.__unicode__()))
+                return_data.append(('__str__', unicode(obj)))
 
             else:
                 for field_name in obj._fields:
+
+                    if field_name in self.exclude:
+                        continue
+
+                    if self.fields and not field_name in self.fields:
+                        continue
 
                     data = getattr(obj, field_name,  '')
                     field_type = obj._fields[field_name]

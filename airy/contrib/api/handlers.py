@@ -9,9 +9,15 @@ class APIHandler(AiryRequestHandler):
     exclude = set()
     levels = 1
 
+    def __init__(self, *args, **kwargs):
+        super(APIHandler, self).__init__(*args, **kwargs)
+
+        if not self.fields:
+            self.fields = set(self.model._fields.keys())
+
     def get_filter_query(self):
         arguments = self.get_flat_arguments()
-        use_fields = self.fields if self.fields else arguments.keys()
+        use_fields = set(self.fields) & set(arguments.keys())
         use_fields = set(use_fields) - set(self.exclude)
         query_dict = dict((field, arguments[field]) for field in use_fields)
         return Q(**query_dict)
@@ -31,7 +37,7 @@ class APIHandler(AiryRequestHandler):
 
     def serialize(self, queryset):
         try:
-            return self.serializer(levels=self.levels).serialize(queryset)
+            return self.serializer(levels=self.levels, fields=self.fields, exclude=self.exclude).serialize(queryset)
         except ValidationError, e:
             logging.warn("API Error: %s" % e)
             if settings.debug:
@@ -39,12 +45,14 @@ class APIHandler(AiryRequestHandler):
             else:
                 return ''
 
+    @report_on_fail
     def get(self, id=None):
         queryset = self.get_queryset(id)
         self.set_header("Content-Type", "application/json")
         self.write(self.serialize(queryset))
         self.finish()
 
+    @report_on_fail
     def put(self, id=None):
         queryset = self.get_queryset(id)
         if queryset:
@@ -53,6 +61,7 @@ class APIHandler(AiryRequestHandler):
         self.write(self.serialize(queryset))
         self.finish()
 
+    @report_on_fail
     def post(self, id=None):
         if id:
             queryset = self.get_queryset(id)
@@ -66,6 +75,7 @@ class APIHandler(AiryRequestHandler):
         self.write(self.serialize(queryset))
         self.finish()
 
+    @report_on_fail
     def delete(self, id=None):
         queryset = self.get_queryset(id)
         if queryset:
