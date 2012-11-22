@@ -2,18 +2,42 @@ from airy.core.web import *
 from airy.core.db import *
 from airy.core.serializers.json import JSONSerializer
 
+def expose_method(f):
+    def wrapped(self, *args, **kwargs):
+        if f.__name__ in self.methods:
+            return f(self, *args, **kwargs)
+        else:
+            self.write("Method Not Available")
+            self.finish()
+    return wrapped
+
 class APIHandler(AiryRequestHandler):
     model = Document
     serializer = JSONSerializer
     fields = set()
     exclude = set()
     levels = 1
+    methods = ('get', 'post', 'put', 'delete')
 
     def __init__(self, *args, **kwargs):
         super(APIHandler, self).__init__(*args, **kwargs)
 
         if not self.fields:
             self.fields = set(self.model._fields.keys())
+
+    def _generate_model(self, **kwargs):
+        model_fields = {}
+        for key, value in kwargs.items():
+            field = self.model._fields.get(key, None)
+            if field:
+                print key, value
+                if isinstance(field, ReferenceField):
+                    value = field.document_type.objects.get(pk=value)
+                model_fields[key] = value
+        return self.model(**model_fields)
+
+    def check_xsrf_cookie(self):
+        pass
 
     def get_filter_query(self):
         arguments = self.get_flat_arguments()
@@ -46,6 +70,7 @@ class APIHandler(AiryRequestHandler):
                 return ''
 
     @report_on_fail
+    @expose_method
     def get(self, id=None):
         queryset = self.get_queryset(id)
         self.set_header("Content-Type", "application/json")
@@ -53,6 +78,7 @@ class APIHandler(AiryRequestHandler):
         self.finish()
 
     @report_on_fail
+    @expose_method
     def put(self, id=None):
         queryset = self.get_queryset(id)
         if queryset:
@@ -62,13 +88,14 @@ class APIHandler(AiryRequestHandler):
         self.finish()
 
     @report_on_fail
+    @expose_method
     def post(self, id=None):
         if id:
             queryset = self.get_queryset(id)
             if queryset:
                 queryset.update(**self.get_flat_arguments())
         else:
-            queryset = self.model(**self.get_flat_arguments())
+            queryset = self._generate_model(**self.get_flat_arguments())
             if queryset:
                 queryset.save()
         self.set_header("Content-Type", "application/json")
@@ -76,6 +103,7 @@ class APIHandler(AiryRequestHandler):
         self.finish()
 
     @report_on_fail
+    @expose_method
     def delete(self, id=None):
         queryset = self.get_queryset(id)
         if queryset:
