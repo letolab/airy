@@ -1,4 +1,4 @@
-git+https://github.com/facebook/tornado.git#egg=tornado
-git+https://github.com/hmarr/mongoengine.git@dev#egg=mongoengine
-git+https://github.com/mrjoes/tornadio2.git#egg=tornadio2
+git+https://github.com/letolab/tornado.git#egg=tornado
+git+https://github.com/letolab/mongoengine.git@dev#egg=mongoengine
+git+https://github.com/letolab/tornadio2.git#egg=tornadio2
 
