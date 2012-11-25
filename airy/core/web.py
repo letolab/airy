@@ -461,6 +461,9 @@ class AiryHandler(object):
         for k,v in kwargs.iteritems():
             setattr(self, k, v)
 
+    #
+    # Arguments
+    #
     _ARG_DEFAULT = []
     def get_argument(self, name, default=_ARG_DEFAULT, strip=True):
         """Returns the value of the argument with the given name.
@@ -536,6 +539,7 @@ class AiryHandler(object):
         (e.g. for unnamed groups in the url regex).
         """
         return to_unicode(value)
+
 
     def __getattr__(self, item):
         return getattr(self.connection, item)
@@ -709,6 +713,86 @@ class AiryCoreHandler(SocketConnection):
             name, value, max_age_days=max_age_days)
 
     #
+    # Arguments
+    #
+    _ARG_DEFAULT = []
+    def get_argument(self, name, default=_ARG_DEFAULT, strip=True):
+        """Returns the value of the argument with the given name.
+
+        If default is not provided, the argument is considered to be
+        required, and we throw an HTTP 400 exception if it is missing.
+
+        If the argument appears in the url more than once, we return the
+        last value.
+
+        The returned value is always unicode.
+        """
+        args = self.get_arguments(name, strip=strip)
+        if not args:
+            if default is self._ARG_DEFAULT:
+                raise HTTPError(400, "Missing argument %s" % name)
+            return default
+        return args[-1]
+
+    def get_arguments(self, name, strip=True):
+        """Returns a list of the arguments with the given name.
+
+        If the argument is not present, returns an empty list.
+
+        The returned values are always unicode.
+        """
+        values = []
+        for v in self.info.arguments.get(name, []):
+            v = self.decode_argument(v, name=name)
+            if isinstance(v, unicode):
+                # Get rid of any weird control chars (unless decoding gave
+                # us bytes, in which case leave it alone)
+                v = re.sub(r"[\x00-\x08\x0e-\x1f]", " ", v)
+            if strip and (isinstance(v, unicode) or isinstance(v, str)):
+                v = v.strip()
+            values.append(v)
+        return values
+
+    def _flatten_arguments(self, arguments):
+        data = {}
+        for key, value in arguments.items():
+            if isinstance(value, list):
+                if len(value) == 0:
+                    data[key] = None
+                elif len(value) == 1:
+                    data[key] = value[0]
+                else:
+                    data[key] = value
+            else:
+                data[key] = value
+        return data
+
+    def get_flat_arguments(self):
+        arguments = {}
+        for key in self.info.arguments:
+            arguments[key] = self.get_arguments(key)
+        return self._flatten_arguments(arguments)
+
+    def get_files(self):
+        return self.files
+
+    def decode_argument(self, value, name=None):
+        """Decodes an argument from the request.
+
+        The argument has been percent-decoded and is now a byte string.
+        By default, this method decodes the argument as utf-8 and returns
+        a unicode string, but this may be overridden in subclasses.
+
+        This method is used as a filter for both get_argument() and for
+        values extracted from the url and passed to get()/post()/etc.
+
+        The name of the argument is provided if known, but may be None
+        (e.g. for unnamed groups in the url regex).
+        """
+        return to_unicode(value)
+
+
+    #
     # Authentication
     #
     @property
@@ -788,6 +872,7 @@ class AiryCoreHandler(SocketConnection):
     def __getattr__(self, item):
         # Front-end proxy
         return getattr(self.ui, item)
+
 
 
 
