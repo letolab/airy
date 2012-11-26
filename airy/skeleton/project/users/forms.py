@@ -5,21 +5,15 @@ from airy.core.conf import settings
 from os.path import join
 
 from users.auth import authenticate, login
-from users.models import User, Session, Service, Experience, Education, Book, Interest
+from users.models import User, Session
 
 
 class RegistrationForm(forms.Form):
-    username = forms.CharField()
     email = forms.EmailField()
     first_name = forms.CharField()
     last_name = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput(render_value=True))
     password2 = forms.CharField(widget=forms.PasswordInput(render_value=True), label='Confirm password')
-
-    def clean_username(self):
-        if User.objects.filter(username=self.cleaned_data['username']).count() > 0:
-            raise forms.ValidationError('A user with such username is already registered')
-        return self.cleaned_data['username']
 
     def clean_email(self):
         if User.objects.filter(email=self.cleaned_data['email']).count() > 0:
@@ -35,18 +29,19 @@ class RegistrationForm(forms.Form):
         return self.cleaned_data
 
     def save(self, obj):
-        user = User(username=self.cleaned_data['username'],
-                    first_name=self.cleaned_data['first_name'],
-                    last_name=self.cleaned_data['last_name'],
-                    email=self.cleaned_data['email'],
-                    education=[],
-                    experience=[],
-                    services=[]
+        user = User(
+            username=self.cleaned_data['email'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name'],
+            email=self.cleaned_data['email'],
+            education=[],
+            experience=[],
+            services=[]
         )
         user.set_password(self.cleaned_data['password'])
         user.save()
 
-        user = authenticate(username=self.cleaned_data['username'], password=self.cleaned_data['password'])
+        user = authenticate(username=self.cleaned_data['email'], password=self.cleaned_data['password'])
 
         session_key = md5(self.cleaned_data['username'] + self.cleaned_data['password'])
         obj.set_secure_cookie("session_key", session_key.hexdigest())
@@ -79,106 +74,6 @@ class LoginForm(forms.Form):
     def save(self, handler):
         login(self.user, self.cleaned_data['password'], handler)
         return self.user
-
-
-class EducationForm(forms.Form):
-    university = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-    degree = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-    major = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-    description = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'post-body'}),
-        required=False
-    )
-    start_date = forms.DateTimeField()
-    end_date = forms.DateTimeField(required=False)
-
-    def save(self, handler):
-        user = handler.get_current_user()
-        education = Education(university=self.cleaned_data['university'],
-                              degree=self.cleaned_data['degree'],
-                              major=self.cleaned_data['major'],
-                              description=self.cleaned_data['description'],
-                              start_date=self.cleaned_data['start_date'],
-                              end_date=self.cleaned_data['end_date']
-        )
-        education.save()
-        user.education.append(education)
-        user.save()
-        return education
-
-
-class ExperienceForm(forms.Form):
-    employer = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-    position = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-    description = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'post-body'}),
-        required=False
-    )
-    start_date = forms.DateTimeField()
-    end_date = forms.DateTimeField(required=False)
-
-    def save(self, handler):
-        user = handler.get_current_user()
-        experience = Experience(employer=self.cleaned_data['employer'],
-                                position=self.cleaned_data['position'],
-                                description=self.cleaned_data['description'],
-                                start_date=self.cleaned_data['start_date'],
-                                end_date=self.cleaned_data['end_date']
-        )
-        experience.save()
-        user.experience.append(experience)
-        user.save()
-        return experience
-
-
-class ServicesForm(forms.Form):
-    name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'large input-text'})
-    )
-
-    def save(self, handler):
-        user = handler.get_current_user()
-        service = Service.objects.get_or_create(name=self.cleaned_data['name'])[0]
-        service.providers_num += 1
-        service.save()
-        user.services.append(service)
-        user.save()
-        return service
-
-
-class RecommendedBookForm(forms.Form):
-    text = forms.CharField(max_length=1024)
-    ref = forms.URLField()
-
-    def save(self, handler):
-        user = handler.get_current_user()
-        book = Book(text=self.cleaned_data['text'], ref=self.cleaned_data['ref'])
-        book.save()
-        user.recommended_books.append(book)
-        user.save()
-        return book
-
-
-class InterestsForm(forms.Form):
-    interest = forms.CharField(max_length=64, label='')
-
-    def save(self, handler):
-        user = handler.get_current_user()
-        interest = Interest(tag=self.cleaned_data['interest'])
-        interest.save()
-        user.interests.append(interest)
-        user.save()
-        return interest
 
 
 class FileUploadForm(forms.Form):
