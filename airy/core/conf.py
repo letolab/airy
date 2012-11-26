@@ -106,7 +106,7 @@ def _ensure_defaults(dsettings, options, project_root, config_filename):
 def _preconfigure(project_root, config_filename='settings.py', argv=[]):
     "Read config file, process command-line args"
     tornado.options.parse_command_line(argv)
-    tornado.options.parse_config_file(config_filename)
+    tornado.options.parse_config_file(os.path.join(project_root, config_filename))
 
     dsettings = {}
     parsed_options = getattr(options, '_options', options)
