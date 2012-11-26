@@ -85,6 +85,7 @@ class UIProxy(object):
         Execute JavaScript given in ``data`` on the client side.
         """
         self.connection.emit('execute', data)
+        self._data = ''
         return self
 
     def redirect(self, url):
