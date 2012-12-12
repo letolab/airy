@@ -39,11 +39,22 @@ class APIHandler(AiryRequestHandler):
     def check_xsrf_cookie(self):
         pass
 
+    def deserialize_query(self, query_dict):
+        for field_name in query_dict:
+            field = self.model._fields.get(field_name)
+            if isinstance(field, BooleanField):
+                query_dict[field_name] = bool(query_dict[field_name])
+            if isinstance(field, IntField):
+                query_dict[field_name] = int(query_dict[field_name])
+
+        return query_dict
+
     def get_filter_query(self):
         arguments = self.get_flat_arguments()
         use_fields = set(self.fields) & set(arguments.keys())
         use_fields = set(use_fields) - set(self.exclude)
         query_dict = dict((field, arguments[field]) for field in use_fields)
+        query_dict = self.deserialize_query(query_dict)
         return Q(**query_dict)
 
     def get_queryset(self, id=None):
