@@ -60,7 +60,7 @@ class APIHandler(AiryRequestHandler):
     def get_queryset(self, id=None):
         try:
             if id:
-                queryset = self.model.objects.filter(self.get_filter_query()).get(id=id)
+                queryset = self.model.objects.get(id=id)
             else:
                 queryset = self.model.objects.filter(self.get_filter_query())
         except Exception, e:
@@ -93,7 +93,7 @@ class APIHandler(AiryRequestHandler):
     def put(self, id=None):
         queryset = self.get_queryset(id)
         if queryset:
-            queryset.update(**self.get_flat_arguments())
+            queryset.update(**dict([("set__%s" % key, value) for key, value in self.get_flat_arguments().items()]))
         self.set_header("Content-Type", "application/json")
         self.write(self.serialize(queryset))
         self.finish()
@@ -104,7 +104,7 @@ class APIHandler(AiryRequestHandler):
         if id:
             queryset = self.get_queryset(id)
             if queryset:
-                queryset.update(**self.get_flat_arguments())
+                queryset.update(**dict([("set__%s" % key, value) for key, value in self.get_flat_arguments().items()]))
         else:
             queryset = self._generate_model(**self.get_flat_arguments())
             if queryset:
