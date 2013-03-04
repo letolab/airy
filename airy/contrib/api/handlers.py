@@ -30,7 +30,6 @@ class APIHandler(AiryRequestHandler):
         for key, value in kwargs.items():
             field = self.model._fields.get(key, None)
             if field:
-                print key, value
                 if isinstance(field, ReferenceField):
                     value = field.document_type.objects.get(pk=value)
                 model_fields[key] = value
