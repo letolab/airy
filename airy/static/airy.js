@@ -136,11 +136,7 @@ airy = {
         },
 
         is_airy_form: function(form) {
-            if (window.location.href.substring(0, 7) == 'http://')
-            if (!form.hasClass('no-airy')) {
-                return true;
-            }
-            return false;
+            return !form.hasClass('no-airy');
         },
 
         no_state_change: function(item) {
@@ -164,7 +160,7 @@ airy = {
 
 $(function() {
 
-    airy.socket = new io.connect("http://" + window.location.host, {'connect timeout': 1000});
+    airy.socket = new io.connect(window.location.protocol + "//" + window.location.host, {'connect timeout': 1000});
 
     airy.socket.on('connect', function() {
         airy.init();
