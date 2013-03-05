@@ -160,7 +160,12 @@ airy = {
 
 $(function() {
 
-    airy.socket = new io.connect(window.location.protocol + "//" + window.location.host, {'connect timeout': 1000});
+    airy.socket = new io.connect(window.location.protocol + "//" + window.location.host,  {
+        'connect timeout': 2000,
+        'reconnect': true,
+        'reconnection delay': 500,
+        'max reconnection attempts': 999
+    });
 
     airy.socket.on('connect', function() {
         airy.init();

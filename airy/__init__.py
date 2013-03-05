@@ -1,6 +1,6 @@
 __author__ = 'LetoLab Ltd'
 
-VERSION = (0, 3, 0)
+VERSION = (0, 3, 1)
 
 def get_version():
     version = '%s.%s' % (VERSION[0], VERSION[1])
