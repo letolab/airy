@@ -44,7 +44,7 @@ airy = {
         if (airy.history.getState().hash == url || nostate) {
             airy.call({method: method, url: url, data: data, change_state: !nostate});
         } else {
-            airy.history.pushState({method: method, data: data}, null, url);
+            airy.history.pushState({method: method, data: data, url: url}, null, url);
         }
     },
 
@@ -80,12 +80,13 @@ airy = {
             }
         },
         redirect: function(url) {
-            airy.history.pushState({}, null, url);
+            airy.history.pushState({url: url}, null, url);
         }
     },
 
     configure: {
         history: function() {
+            airy.history.pushState({url: window.location.pathname}, null, window.location.pathname);
             airy.history.Adapter.bind(window, 'statechange', function() {
                 var State = airy.history.getState();
                 airy.call({method: State.data.method, url: State.hash, data: State.data.data, change_state: false});
@@ -147,6 +148,9 @@ airy = {
 
     util: {
         fix_url: function(url) {
+            if (!url) {
+                return '';
+            }
             if (url.indexOf('.') == 0) {
                 url = url.substring(1);
             }
